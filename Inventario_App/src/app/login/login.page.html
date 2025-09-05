@@ -1,13 +1,27 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>login</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">login</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <form class="form" (ngSubmit)="onSubmit()"> 
+    <ion-input
+      id="email"
+      name="email"
+      type="email"
+      placeholder="usuario@correo.com"
+      [(ngModel)]="email"
+      required>
+    </ion-input>
+
+    <ion-input
+      id="password"
+      name="password"
+      type="password"
+      placeholder="**********"
+      [(ngModel)]="password"
+      required>
+    </ion-input>
+
+    <div>
+      <ion-button shape="round" expand="block" type="submit">Entrar</ion-button>
+      <ion-button (click)="registro()" shape="round" expand="block" type="button">Registrarse</ion-button>
+    </div>
+    
+  </form>
 </ion-content>
