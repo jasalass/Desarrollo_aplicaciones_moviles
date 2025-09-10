@@ -55,7 +55,5 @@ export class HomePage {
     // this.router.navigate(['/buscar-producto']);
   }
 
-  goRecover() {
-    this.router.navigate(['/recuperar-password']);
-  }
+  
 }
