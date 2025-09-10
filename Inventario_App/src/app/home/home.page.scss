@@ -1,27 +1,36 @@
-#container {
-  text-align: center;
+:host { display: block; }
+ion-content { --background: var(--ion-background-color); }
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
+/* Toolbar sin sombras ni degradados */
+ion-header, ion-toolbar {
+  --background: var(--ion-background-color);
+  --color: var(--ion-text-color);
+  border-bottom: 1px solid var(--border, #1f2937);
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
+/* Tarjeta/Sección plana */
+.section {
+  margin: 16px;
+  padding: 16px;
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 8px;
+  background: var(--ion-background-color);
 }
 
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
+/* Lista simple */
+ion-list { --background: transparent; }
+ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  border-bottom: 1px solid var(--border, #1f2937);
 }
+ion-item:last-child { border-bottom: 0; }
 
-#container a {
-  text-decoration: none;
+/* Botones del home (si los hay) */
+ion-button {
+  --border-radius: 8px;
+  --text-transform: none;
+  --box-shadow: none;
+  height: 44px;
 }

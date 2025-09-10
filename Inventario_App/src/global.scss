@@ -35,3 +35,43 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+/* Centrado simple sin adornos */
+.centered {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space);
+}
+
+/* Tarjeta plana sin sombra */
+.card {
+  width: 100%;
+  max-width: 380px;
+  padding: calc(var(--space) * 1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--ion-background-color);
+}
+
+/* Pila vertical con espacios constantes */
+.stack > * + * { margin-top: 12px; }
+
+/* Campo simple (ion-item + ion-input) */
+.field {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: transparent;
+}
+.field ion-item {
+  --background: transparent;
+  --padding-start: 10px;
+  --inner-padding-end: 10px;
+  --min-height: var(--input-h);
+}
+.field ion-input::part(native) {
+  font-size: 0.95rem;
+}
+

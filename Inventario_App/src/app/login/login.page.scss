@@ -1,6 +1,73 @@
-.form{
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10%;
+:host { display: block; }
+ion-content { --background: var(--ion-background-color); }
+
+/* Estructura simple sobre lo que ya existe */
+.form {
+  width: 100%;
+  max-width: 380px;
+  margin: 10vh auto;
+  padding: 16px;
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 8px;
+  background: var(--ion-background-color);
+}
+
+/* Separación vertical mínima */
+.form > * + * { margin-top: 12px; }
+
+/* Campos planos */
+.form ion-input {
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --min-height: 44px;
+  font-size: 0.95rem;
+  background: transparent;
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 8px;
+}
+
+/* Mensajes de error compactos */
+ion-text[color="danger"] {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.88rem;
+}
+
+/* Botones sobrios (sin azul chillón) */
+.form ion-button {
+  --border-radius: 8px;
+  --text-transform: none;
+  --box-shadow: none;
+  height: 44px;
+}
+
+/* Fuerza un primario neutro aunque el HTML use color="primary" */
+.form ion-button[type="submit"] {
+  --background: #374151 !important;
+  --color: #ffffff !important;
+}
+
+/* Botón secundario (outline discreto) */
+.form ion-button[type="button"] {
+  --background: transparent !important;
+  --border-color: #374151 !important;
+  --color: #e5e7eb !important;
+  --border-width: 1px;
+}
+
+/* Enlace recuperar contraseña */
+a[routerLink] {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.92rem;
+  color: #60a5fa;
+  text-decoration: none;
+}
+a[routerLink]:hover { text-decoration: underline; }
+
+/* Modo claro */
+@media (prefers-color-scheme: light) {
+  .form { border-color: #e5e7eb; }
+  .form ion-input { border-color: #e5e7eb; }
+  .form ion-button[type="button"] { --color: #374151 !important; }
 }
