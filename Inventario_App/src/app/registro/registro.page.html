@@ -1,14 +1,58 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>registro</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">registro</ion-title>
-    </ion-toolbar>
-  </ion-header>
-  <h1>hola hola es el registro</h1>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form">
+
+    <!-- EMAIL -->
+    <ion-input
+      type="email"
+      placeholder="usuario@correo.com"
+      formControlName="email"
+      inputmode="email"
+      autocomplete="email"
+      autocapitalize="off"
+      [clearInput]="true">
+    </ion-input>
+    <ion-text color="danger" *ngIf="emailCtrl?.touched && emailCtrl?.invalid">
+      <ng-container *ngIf="emailCtrl?.errors?.['required']">
+        El correo es obligatorio.
+      </ng-container>
+      <ng-container *ngIf="emailCtrl?.errors?.['email']">
+        Ingresa un correo válido (usuario@dominio.com).
+      </ng-container>
+    </ion-text>
+
+    <!-- PASSWORD -->
+    <ion-input
+      type="password"
+      placeholder="**********"
+      formControlName="password"
+      autocomplete="current-password"
+      [clearInput]="true">
+    </ion-input>
+    <ion-text color="danger" *ngIf="passwordCtrl?.touched && passwordCtrl?.invalid">
+      <ng-container *ngIf="passwordCtrl?.errors?.['required']">
+        La contraseña es obligatoria.
+      </ng-container>
+      <ng-container *ngIf="passwordCtrl?.errors?.['minlength']">
+        Debe tener al menos 6 caracteres.
+      </ng-container>
+      <ng-container *ngIf="passwordCtrl?.errors?.['maxlength']">
+        No puede exceder 8 caracteres.
+      </ng-container>
+    </ion-text>
+
+    <div class="mt-3">
+      <ion-button  shape="round" expand="block" type="submit" [disabled]="registerForm.invalid">
+        Registrarse
+      </ion-button>
+      
+    </div>
+  </form>
 </ion-content>
+
+
+<ion-toast
+  [isOpen]="isToastOpen"
+  [duration]="3000"
+  [message]="toastMessage"
+  (didDismiss)="isToastOpen = false">
+</ion-toast>

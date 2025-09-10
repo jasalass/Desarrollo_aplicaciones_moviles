@@ -1,5 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
 
+<ion-content [fullscreen]="true" class="ion-padding">
 
-<ion-content [fullscreen]="true">
-  
+  <!-- Bienvenida -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>¡Bienvenido, {{ usuario }}!</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>
+        Esta es una versión de prueba para validar el flujo del proyecto de
+        <strong>Localización y Gestión de Productos en Bodega</strong>.
+      </p>
+      <p class="ion-margin-top"><strong>Acciones rápidas</strong></p>
+      <div class="ion-margin-top">
+        <ion-button expand="block" shape="round" (click)="goScan()">Escanear estante (QR)</ion-button>
+        <ion-button expand="block" shape="round" (click)="goAddProduct()">Agregar producto</ion-button>
+        <ion-button expand="block" shape="round" (click)="goSearchProduct()">Buscar producto</ion-button>
+        <ion-button expand="block" fill="clear" (click)="goRecover()">Recuperar contraseña</ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Resumen de la propuesta -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Propuesta Evaluación Parcial 1</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p class="ion-margin-bottom"><strong>Contexto y problemática</strong></p>
+      <p>
+        En una bodega, la ubicación y el registro manual de productos provocan errores,
+        demoras y dificultades para encontrar ítems, reduciendo la eficiencia operativa.
+      </p>
+
+      <p class="ion-margin-top"><strong>Solución propuesta</strong></p>
+      <p>
+        App móvil  para localización y gestión de productos.
+      </p>
+
+      <p class="ion-margin-top"><strong>Funcionalidades principales</strong></p>
+      <ion-list lines="none">
+        <ion-item><ion-label>Ingreso de usuario (login + recuperación)</ion-label></ion-item>
+        <ion-item><ion-label>Perfiles: Bodeguero y Administrador</ion-label></ion-item>
+        <ion-item><ion-label>Página de inicio con accesos rápidos</ion-label></ion-item>
+        <ion-item><ion-label>Escaneo de estantes por QR → “estante activo”</ion-label></ion-item>
+        <ion-item><ion-label>Registro de productos (manual / código de barras)</ion-label></ion-item>
+        <ion-item><ion-label>Búsqueda por código o nombre con ubicación</ion-label></ion-item>
+      </ion-list>
+
+      
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Toast genérico -->
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMessage"
+    [duration]="1800"
+    color="medium"
+    position="bottom"
+    (didDismiss)="isToastOpen = false">
+  </ion-toast>
+
 </ion-content>

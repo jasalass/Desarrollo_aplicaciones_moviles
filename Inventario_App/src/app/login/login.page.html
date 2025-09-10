@@ -1,27 +1,62 @@
 <ion-content [fullscreen]="true">
-  <form class="form" (ngSubmit)="onSubmit()"> 
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="form">
+
+    <!-- EMAIL -->
     <ion-input
-      id="email"
-      name="email"
       type="email"
       placeholder="usuario@correo.com"
-      [(ngModel)]="email"
-      required>
+      formControlName="email"
+      inputmode="email"
+      autocomplete="email"
+      autocapitalize="off"
+      [clearInput]="true">
     </ion-input>
+    <ion-text color="danger" *ngIf="emailCtrl?.touched && emailCtrl?.invalid">
+      <ng-container *ngIf="emailCtrl?.errors?.['required']">
+        El correo es obligatorio.
+      </ng-container>
+      <ng-container *ngIf="emailCtrl?.errors?.['email']">
+        Ingresa un correo válido (usuario@dominio.com).
+      </ng-container>
+    </ion-text>
 
+    <!-- PASSWORD -->
     <ion-input
-      id="password"
-      name="password"
       type="password"
       placeholder="**********"
-      [(ngModel)]="password"
-      required>
+      formControlName="password"
+      autocomplete="current-password"
+      [clearInput]="true">
     </ion-input>
+    <ion-text color="danger" *ngIf="passwordCtrl?.touched && passwordCtrl?.invalid">
+      <ng-container *ngIf="passwordCtrl?.errors?.['required']">
+        La contraseña es obligatoria.
+      </ng-container>
+      <ng-container *ngIf="passwordCtrl?.errors?.['minlength']">
+        Debe tener al menos 6 caracteres.
+      </ng-container>
+      <ng-container *ngIf="passwordCtrl?.errors?.['maxlength']">
+        No puede exceder 8 caracteres.
+      </ng-container>
+    </ion-text>
 
-    <div>
-      <ion-button shape="round" expand="block" type="submit">Entrar</ion-button>
-      <ion-button (click)="registro()" shape="round" expand="block" type="button">Registrarse</ion-button>
+    <div class="mt-3">
+      <ion-button  shape="round" expand="block" type="submit" [disabled]="loginForm.invalid">
+        Entrar
+      </ion-button>
+      <a [routerLink]="['/recuperar-password']" >Recuperar contraseña</a>
+      <ion-button [routerLink]="['/registro']" shape="round" expand="block" type="button" >
+        Registrarse
+      </ion-button>
     </div>
-    
   </form>
 </ion-content>
+
+<ion-toast
+  [isOpen]="isToastOpen"
+  [duration]="5000"
+  [message]="toastMessage"
+  (didDismiss)="isToastOpen = false">
+</ion-toast>
+
+<ion-loading trigger="open-loading" message="Cargando..." duration="2000"></ion-loading>
