@@ -27,7 +27,7 @@ export class HomePage {
   toastMessage = '';
 
   constructor(private router: Router) {
-    // 1) intentar leer desde el estado de navegación (login)
+    //intentar leer desde el estado de navegación (login)
     const stateEmail = this.router.getCurrentNavigation()?.extras?.state?.['email'];
 
     this.usuario = stateEmail || 'Usuario';
