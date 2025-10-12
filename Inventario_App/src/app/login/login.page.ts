@@ -5,7 +5,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 // Ionic Standalone Components
 import { IonContent, IonButton, IonInput, IonText, IonToast, IonLoading } from '@ionic/angular/standalone';
 import { Router, RouterModule } from '@angular/router';
-
+import { SupabaseService } from '../services/supabase';
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -18,6 +18,8 @@ export class LoginPage {
   loginForm: FormGroup;
   isToastOpen = false;
   toastMessage: string = "";
+  toastDuration = 2000;          // <- controla duración
+  nextRouteAfterToast: string | null = null; // <- a dónde navegar tras el toast
 
   // función para mostrar un toast con mensaje personalizado
   showToast(msg: string) {
@@ -25,7 +27,7 @@ export class LoginPage {
     this.isToastOpen = true;
   }
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(private fb: FormBuilder, private router: Router, private sb: SupabaseService) {
     // Construcción del formulario con validaciones integradas de Angular
     this.loginForm = this.fb.group({
       email: [
@@ -51,21 +53,11 @@ export class LoginPage {
   get passwordCtrl() { return this.loginForm.get('password'); }
 
   ngOnInit() {
-    // Si no existe la clave "usuarios" en localStorage, la inicializamos como arreglo vacío
-    if (!localStorage.getItem('usuarios')) {
-      localStorage.setItem('usuarios', JSON.stringify([]));
-    }
-
-    let sesion = JSON.parse(localStorage.getItem('sesion') || 'false');
-    console.log(sesion)
-
-    if (sesion){
-      this.router.navigateByUrl('/home');
-    }
+  
+    
   }
 
-
-  onSubmit() {
+  async onSubmit() {
     // Si el formulario es inválido, marcamos todos los campos como "tocados"
     // Esto hace que se muestren los mensajes de error
     if (this.loginForm.invalid) {
@@ -73,30 +65,20 @@ export class LoginPage {
       return;
     }
 
-    
-
     // Extraemos email y password del formulario
     const { email, password } = this.loginForm.value;
 
-    // Obtenemos la lista de usuarios guardados
-    const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      const { data, error } = await this.sb.signIn(email, password);
 
+      if (error) {
+        console.log(error)
+        this.showToast(error.message)
+      }
 
-    const usuario = usuarios.find((u: any) => u.email === email);
-
-    if (usuario && usuario.password === password) {
-      //  Coinciden email y password
-      localStorage.setItem('sesion', JSON.stringify(true));
-      this.router.navigateByUrl('/home', {
-        state: { email: this.loginForm.value.email }
-      });
-    } else if (usuario) {
-      //  Email existe pero la password no coincide
-      this.showToast("Credenciales inválidas");
-    } else {
-      //  No existe ese email en usuarios
-      this.showToast("Usuario no registrado");
-    }
+     // Éxito: Supabase guardó la sesión/token automáticamente (persistSession: true)
+      this.showToast(`Bienvenido: ${data.user?.email ?? email}`);
+      this.nextRouteAfterToast = '/home'; // navega cuando el toast se cierre
+     
   }
 }
 

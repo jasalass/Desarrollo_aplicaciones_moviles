@@ -52,7 +52,7 @@
 
 <ion-toast
   [isOpen]="isToastOpen"
-  [duration]="3000"
   [message]="toastMessage"
-  (didDismiss)="isToastOpen = false">
+  [duration]="toastDuration"
+  (didDismiss)="isToastOpen = false; onToastDismiss()">
 </ion-toast>
