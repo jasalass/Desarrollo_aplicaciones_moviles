@@ -25,7 +25,7 @@
       type="password"
       placeholder="**********"
       formControlName="password"
-      autocomplete="current-password"
+      autocomplete="new-password"
       [clearInput]="true">
     </ion-input>
     <ion-text color="danger" *ngIf="passwordCtrl?.touched && passwordCtrl?.invalid">
@@ -36,23 +36,21 @@
         Debe tener al menos 6 caracteres.
       </ng-container>
       <ng-container *ngIf="passwordCtrl?.errors?.['maxlength']">
-        No puede exceder 8 caracteres.
+        No puede exceder 12 caracteres.
       </ng-container>
     </ion-text>
 
     <div class="mt-3">
-      <ion-button  shape="round" expand="block" type="submit" [disabled]="registerForm.invalid">
+      <ion-button shape="round" expand="block" type="submit" [disabled]="registerForm.invalid">
         Registrarse
       </ion-button>
-      
     </div>
   </form>
 </ion-content>
-
 
 <ion-toast
   [isOpen]="isToastOpen"
   [message]="toastMessage"
   [duration]="toastDuration"
-  (didDismiss)="isToastOpen = false; onToastDismiss()">
+  (didDismiss)="isToastOpen = false">
 </ion-toast>

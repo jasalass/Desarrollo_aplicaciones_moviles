@@ -48,5 +48,10 @@ export class SupabaseService {
   async getAccessToken(): Promise<string | null> {
     const { data } = await this._client.auth.getSession();
     return data.session?.access_token ?? null;
-    }
+  }
+
+  async getCurrentUserEmail(): Promise<string | null> {
+    const { data } = await this._client.auth.getUser();
+    return data.user?.email ?? null;
+  }
 }

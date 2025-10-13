@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IonContent, IonButton, IonInput, IonText, IonToast } from '@ionic/angular/standalone';
 import { Router, RouterModule } from '@angular/router';
-import { SupabaseService } from '../services/supabase'; // <-- fija el path
+import { LoadingController } from '@ionic/angular';
+import { SupabaseService } from '../services/supabase';
 
 @Component({
   selector: 'app-registro',
@@ -14,12 +15,16 @@ import { SupabaseService } from '../services/supabase'; // <-- fija el path
 })
 export class RegistroPage {
   registerForm: FormGroup;
-  toastMessage = '';
   isToastOpen = false;
-  toastDuration = 2000;          // <- controla duración
-  nextRouteAfterToast: string | null = null; // <- a dónde navegar tras el toast
+  toastMessage = '';
+  toastDuration = 2200;
 
-  constructor(private fb: FormBuilder, private router: Router, private sb: SupabaseService) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private sb: SupabaseService,
+    private loadingCtrl: LoadingController
+  ) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(12)]],
@@ -29,18 +34,10 @@ export class RegistroPage {
   get emailCtrl() { return this.registerForm.get('email'); }
   get passwordCtrl() { return this.registerForm.get('password'); }
 
-  showToast(msg: string, duration = 2000) {
+  private showErrorToast(msg: string, duration = 2200) {
     this.toastMessage = msg;
     this.toastDuration = duration;
     this.isToastOpen = true;
-  }
-
-  // se llama desde el template en (didDismiss)
-  onToastDismiss() {
-    if (this.nextRouteAfterToast) {
-      this.router.navigate([this.nextRouteAfterToast]);
-      this.nextRouteAfterToast = null;
-    }
   }
 
   async onSubmit() {
@@ -52,18 +49,26 @@ export class RegistroPage {
     const { email, password } = this.registerForm.getRawValue() as { email: string; password: string; };
 
     try {
-      const { data, error } = await this.sb.signUp(email, password);
+      const { error } = await this.sb.signUp(email, password);
 
       if (error) {
-        this.showToast("Error en registro, intenta mas tarde", 2500); 
+        this.showErrorToast(error.message || 'Error en registro, intenta más tarde');
         return;
       }
 
-      this.showToast(`Registro correcto, redirigiendo a login`, 2000);
-      this.nextRouteAfterToast = '/login'; // navega cuando el toast se cierre
+      // éxito → loading + navegación a login
+      const loading = await this.loadingCtrl.create({
+        message: 'Creando cuenta...',
+        spinner: 'lines',
+        duration: 1400
+      });
+      await loading.present();
+
+      await loading.onDidDismiss();
+      this.router.navigateByUrl('/login', { replaceUrl: true, state: { email } });
 
     } catch (e: any) {
-      this.showToast(e?.message ?? 'No se pudo registrar', 2500);
+      this.showErrorToast(e?.message ?? 'No se pudo registrar');
     }
   }
 }
