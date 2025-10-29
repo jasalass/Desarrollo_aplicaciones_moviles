@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permite compartir imágenes guardadas en el almacenamiento interno de la app -->
+    <files-path name="internal_images" path="images/" />
+
+    <!-- Permite compartir archivos del caché (por ejemplo, fotos temporales) -->
+    <cache-path name="cache_images" path="images/" />
+
+    <!-- Si realmente necesitas acceso al almacenamiento externo (ej: /Pictures/ o /Downloads/) -->
+    <external-path name="external_images" path="Pictures/" />
+
+    <!-- Evita el uso de path="." porque da acceso completo al directorio raíz -->
+</paths>

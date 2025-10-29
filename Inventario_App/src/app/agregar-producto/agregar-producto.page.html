@@ -1,0 +1,66 @@
+<!-- src/app/agregar-producto/agregar-producto.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Agregar producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Datos del producto</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+
+      <ion-item>
+        <ion-label position="stacked">Código</ion-label>
+        <ion-input formControlName="code" placeholder="SKU-001"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Nombre</ion-label>
+        <ion-input formControlName="name" placeholder="Alcohol gel 500ml"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Descripción</ion-label>
+        <ion-textarea autoGrow="true" formControlName="description"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Stock mínimo</ion-label>
+        <ion-input type="number" formControlName="min_stock"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Cantidad a ingresar</ion-label>
+        <ion-input type="number" formControlName="quantity"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Estante</ion-label>
+        <ion-select formControlName="shelf_id" interface="popover" placeholder="Selecciona un estante">
+          <ion-select-option *ngFor="let s of shelves" [value]="s.id">
+            {{ s.code }} — {{ s.name }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <div class="ion-margin-top ion-text-center">
+        <ion-button (click)="scanShelf()" fill="outline">Escanear estante (QR)</ion-button>
+        <ion-button class="ion-margin-start" (click)="guardar()" expand="block">Guardar</ion-button>
+        <ion-button color="medium" fill="clear" (click)="irHome()">Volver</ion-button>
+      </div>
+
+    </ion-card-content>
+  </ion-card>
+
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMsg"
+    [duration]="toastDur"
+    position="bottom"
+    color="medium"
+    (didDismiss)="isToastOpen = false">
+  </ion-toast>
+</ion-content>

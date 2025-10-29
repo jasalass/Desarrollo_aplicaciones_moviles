@@ -1,0 +1,23 @@
+<ion-content class="ion-padding">
+  <ion-button expand="block" color="primary" (click)="startScan()" [disabled]="scanning">
+    {{ scanning ? 'Escaneando...' : 'Iniciar Escaneo' }}
+  </ion-button>
+
+  <ion-text color="medium" *ngIf="scannedText">
+    <p><strong>Último escaneo:</strong></p>
+    <p>{{ scannedText }}</p>
+  </ion-text>
+
+  <hr>
+
+  <ion-text *ngIf="allScans.length > 0">
+    <p><strong>Historial de escaneos guardados:</strong></p>
+    <ul>
+      <li *ngFor="let s of allScans">{{ s.created_at | date:'short' }} — {{ s.content }}</li>
+    </ul>
+  </ion-text>
+
+  <ion-text color="medium" *ngIf="!allScans.length">
+    <p>No hay escaneos guardados aún.</p>
+  </ion-text>
+</ion-content>

@@ -4,9 +4,9 @@ import { CommonModule } from '@angular/common';
 import {
   IonContent, IonHeader, IonToolbar, IonTitle,
   IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-  IonList, IonItem, IonLabel, IonButton, IonToast
+  IonButton, IonToast
 } from '@ionic/angular/standalone';
-import { SupabaseService } from '../services/supabase';
+import { SupabaseService } from '../services/supabaseService/supabase';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +17,7 @@ import { SupabaseService } from '../services/supabase';
     CommonModule, RouterModule,
     IonContent, IonHeader, IonToolbar, IonTitle,
     IonCard, IonCardHeader, IonCardTitle, IonCardContent,
-    IonList, IonItem, IonLabel, IonButton, IonToast
+    IonButton, IonToast
   ],
 })
 export class HomePage {
@@ -26,15 +26,7 @@ export class HomePage {
   toastMessage = '';
 
   constructor(private router: Router, private sb: SupabaseService) {
-    const stateEmail = this.router.getCurrentNavigation()?.extras?.state?.['email'];
-    if (stateEmail) {
-      this.usuario = stateEmail;
-    } else {
-      // fallback: leer de la sesión
-      this.sb.client.auth.getUser().then(({ data }) => {
-        if (data.user?.email) this.usuario = data.user.email;
-      });
-    }
+    this.sb.currentUserEmail().then(email => { if (email) this.usuario = email; });
   }
 
   showToast(msg: string) {
@@ -42,7 +34,7 @@ export class HomePage {
     this.isToastOpen = true;
   }
 
-  goScan() { this.showToast('Escaneo de estante: demo pendiente'); }
-  goAddProduct() { this.showToast('Agregar producto: demo pendiente'); }
-  goSearchProduct() { this.showToast('Buscar producto: demo pendiente'); }
+  goScan() { this.router.navigateByUrl('/scan'); }
+  goAddProduct() { this.router.navigateByUrl('/agregar-producto'); }
+  goSearchProduct() { this.showToast('Buscar producto: pendiente'); }
 }

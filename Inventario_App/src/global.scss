@@ -75,3 +75,7 @@
   font-size: 0.95rem;
 }
 
+/* Al abrir el escáner, hacemos el fondo transparente para ver la cámara */
+.scanner-active {
+  --ion-background-color: transparent !important;
+}

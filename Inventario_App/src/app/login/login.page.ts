@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonContent, IonButton, IonInput, IonText, IonToast } from '@ionic/angular/standalone';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
-import { SupabaseService } from '../services/supabase';
+import { LoadingController, IonContent, IonButton, IonInput, IonText, IonToast } from '@ionic/angular/standalone';
+import { SupabaseService } from '../services/supabaseService/supabase';
 
 @Component({
   selector: 'app-login',
@@ -32,6 +31,7 @@ export class LoginPage {
     });
   }
 
+  // 👇 ESTOS GETTERS SON LOS QUE FALTAN
   get emailCtrl() { return this.loginForm.get('email'); }
   get passwordCtrl() { return this.loginForm.get('password'); }
 
@@ -46,34 +46,25 @@ export class LoginPage {
       this.loginForm.markAllAsTouched();
       return;
     }
-
     const { email, password } = this.loginForm.getRawValue() as { email: string; password: string; };
 
     try {
-      const { data, error } = await this.sb.signIn(email, password);
-
-      if (error) {
-        this.showErrorToast(error.message || 'Error al iniciar sesión');
-        return;
-      }
-
-      // éxito → loading + navegación
-      localStorage.setItem('sesion', 'true');
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/home';
-
-      const loading = await this.loadingCtrl.create({
-        message: 'Iniciando sesión...',
-        spinner: 'lines',
-        duration: 1200
-      });
+      const loading = await this.loadingCtrl.create({ message: 'Iniciando sesión...', spinner: 'lines' });
       await loading.present();
 
-      // Navega cuando aparezca el loading (no dependemos del toast)
-      await loading.onDidDismiss();
-      this.router.navigateByUrl(returnUrl, { replaceUrl: true, state: { email: data.user?.email ?? email } });
+      const { data, error } = await this.sb.signIn(email, password);
 
-    } catch (e: any) {
-      this.showErrorToast(e?.message ?? 'No se pudo iniciar sesión');
+      await loading.dismiss();
+
+      if (error) {
+        this.showErrorToast('Credenciales inválidas');
+        return;
+      }
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/home';
+      this.router.navigateByUrl(returnUrl, { replaceUrl: true, state: { email: data.user?.email ?? email } });
+    } catch {
+      try { await this.loadingCtrl.dismiss(); } catch {}
+      this.showErrorToast('No se pudo iniciar sesión');
     }
   }
 }

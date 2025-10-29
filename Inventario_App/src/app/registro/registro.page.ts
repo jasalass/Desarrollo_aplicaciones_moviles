@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { IonContent, IonButton, IonInput, IonText, IonToast } from '@ionic/angular/standalone';
 import { Router, RouterModule } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
-import { SupabaseService } from '../services/supabase';
+import { LoadingController, IonContent, IonButton, IonInput, IonText, IonToast } from '@ionic/angular/standalone';
+import { SupabaseService } from '../services/supabaseService/supabase';
 
 @Component({
   selector: 'app-registro',
@@ -26,11 +25,12 @@ export class RegistroPage {
     private loadingCtrl: LoadingController
   ) {
     this.registerForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [Validators.required, Validators.email]] ,
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(12)]],
     });
   }
 
+  // 👇 TAMBIÉN AQUÍ
   get emailCtrl() { return this.registerForm.get('email'); }
   get passwordCtrl() { return this.registerForm.get('password'); }
 
@@ -50,23 +50,16 @@ export class RegistroPage {
 
     try {
       const { error } = await this.sb.signUp(email, password);
-
       if (error) {
-        this.showErrorToast(error.message || 'Error en registro, intenta más tarde');
+        this.showErrorToast(error.message || 'Error en registro');
         return;
       }
 
-      // éxito → loading + navegación a login
-      const loading = await this.loadingCtrl.create({
-        message: 'Creando cuenta...',
-        spinner: 'lines',
-        duration: 1400
-      });
+      const loading = await this.loadingCtrl.create({ message: 'Creando cuenta...', spinner: 'lines', duration: 1400 });
       await loading.present();
-
       await loading.onDidDismiss();
-      this.router.navigateByUrl('/login', { replaceUrl: true, state: { email } });
 
+      this.router.navigateByUrl('/login', { replaceUrl: true, state: { email } });
     } catch (e: any) {
       this.showErrorToast(e?.message ?? 'No se pudo registrar');
     }
