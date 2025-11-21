@@ -1,14 +1,23 @@
-/* Paleta mínima */
 :root {
-  --ion-color-primary: #2563eb;        /* azul discreto */
-  --ion-text-color: #0f172a;           /* gris muy oscuro */
-  --ion-background-color: #ffffff;     /* fondo claro */
-  --border: #e5e7eb;                   /* gris de borde */
-  --radius: 8px;
-  --space: 16px;
-  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-  --input-h: 44px;
+  --ion-color-primary: #1E3A8A;
+  --ion-color-primary-rgb: 30, 58, 138;
+
+  --ion-color-secondary: #E5E7EB;
+  --ion-color-secondary-rgb: 229, 231, 235;
+
+  --ion-color-success: #16A34A;
+  --ion-color-success-rgb: 22, 163, 74;
+
+  --ion-color-warning: #FACC15;
+  --ion-color-warning-rgb: 250, 204, 21;
+
+  --ion-color-danger: #DC2626;
+  --ion-color-danger-rgb: 220, 38, 38;
+
+  --ion-background-color: #F9FAFB;
+  --ion-text-color: #374151;
 }
+
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -33,3 +42,4 @@ ion-button {
   --text-transform: none;
   height: var(--input-h);
 }
+

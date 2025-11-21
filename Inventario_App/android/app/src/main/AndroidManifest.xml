@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
   <!-- Permisos -->
-  <uses-permission android:name="android.permission.INTERNET" />
   <uses-permission android:name="android.permission.CAMERA" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  
 
   <!-- Cámara opcional (no bloquea instalación en equipos sin cámara) -->
   <uses-feature android:name="android.hardware.camera.any" android:required="false" />

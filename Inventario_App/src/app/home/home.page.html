@@ -6,21 +6,86 @@
 
 <ion-content [fullscreen]="true" class="ion-padding">
 
-  <!-- Bienvenida -->
-  <ion-card>
+  <!-- Encabezado de bienvenida -->
+  <div class="home-header">
+    <h2>Hola, {{ usuario }} 👋</h2>
+    <p class="home-subtitle">
+      Gestiona el inventario de tus bodegas escaneando, registrando productos
+      y manteniendo todo sincronizado.
+    </p>
+  </div>
+
+  <!-- Acciones principales -->
+  <ion-card class="home-actions">
     <ion-card-header>
-      <ion-card-title>¡Bienvenido, {{ usuario }}!</ion-card-title>
+      <ion-card-title>Acciones rápidas</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <div class="ion-margin-top">
-        <ion-button expand="block" shape="round" (click)="goScan()">Escanear estante (QR)</ion-button>
-        <ion-button expand="block" shape="round" (click)="goAddProduct()">Agregar producto</ion-button>
-        <ion-button expand="block" shape="round" (click)="goSearchProduct()">Buscar producto</ion-button>
+      <div class="actions-grid">
+        <ion-button expand="block" shape="round" (click)="goScan()">
+          <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+          Escanear estante (QR)
+        </ion-button>
+
+        <ion-button expand="block" shape="round" color="secondary" (click)="goAddProduct()">
+          <ion-icon slot="start" name="cube-outline"></ion-icon>
+          Agregar producto
+        </ion-button>
+
+        <ion-button expand="block" shape="round" fill="outline" (click)="goSearchProduct()">
+          <ion-icon slot="start" name="search-outline"></ion-icon>
+          Buscar producto
+        </ion-button>
+
+        <ion-button expand="block" shape="round" fill="clear" (click)="syncInventario()">
+          <ion-icon slot="start" name="sync-outline"></ion-icon>
+          Sincronizar inventario
+        </ion-button>
       </div>
     </ion-card-content>
   </ion-card>
 
-  
+  <!-- Sección bodegas -->
+  <section class="home-section">
+    <div class="home-section-header">
+      <h3>Bodegas disponibles</h3>
+      <ion-button size="small" fill="clear" (click)="loadWarehouses()">
+        <ion-icon slot="start" name="sync-outline"></ion-icon>
+        Actualizar
+      </ion-button>
+    </div>
+
+    <!-- Estado de carga -->
+    <div *ngIf="isLoadingWarehouses" class="loading-state">
+      <ion-spinner name="lines"></ion-spinner>
+      <p>Cargando bodegas...</p>
+    </div>
+
+    <!-- Lista de bodegas -->
+    <ng-container *ngIf="!isLoadingWarehouses">
+      <ion-card *ngIf="!warehouses.length">
+        <ion-card-content>
+          Aún no hay bodegas registradas en el sistema.
+        </ion-card-content>
+      </ion-card>
+
+      <ion-list *ngIf="warehouses.length" class="warehouses-list">
+        <ion-item
+          *ngFor="let wh of warehouses"
+          lines="none"
+          class="warehouse-item"
+        >
+          <ion-icon slot="start" name="business-outline"></ion-icon>
+          <ion-label>
+            <h2>{{ wh.name }}</h2>
+            <p class="code">{{ wh.code }}</p>
+            <p *ngIf="wh.address" class="address">{{ wh.address }}</p>
+            <p *ngIf="wh.comments" class="comments">{{ wh.comments }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ng-container>
+  </section>
 
   <!-- Toast -->
   <ion-toast

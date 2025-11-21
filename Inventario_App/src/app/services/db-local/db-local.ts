@@ -39,14 +39,22 @@ export class LocalDbService {
     await this.db!.open();
     await this.createSchema();
 
-    // Seed meta_sync
+    // meta_sync por si acaso
     await this.run(
-      `INSERT OR IGNORE INTO meta_sync(key,value) VALUES ('last_pull','1970-01-01T00:00:00.000Z')`
+      `INSERT OR IGNORE INTO meta_sync(key,value)
+      VALUES ('last_pull','1970-01-01T00:00:00.000Z')`
     );
 
-    // Datos de prueba
-    await this.seedDevData();
+    // 🔹 NUEVO: solo sembrar si aún NO hay bodegas
+    const rows = await this.query<{ cnt: number }>(
+      `SELECT COUNT(*) as cnt FROM warehouses`
+    );
+
+    if (!rows[0] || rows[0].cnt === 0) {
+      await this.seedDevData();
+    }
   }
+
 
   // ========= SCHEMA =========
   private async createSchema() {
@@ -145,75 +153,67 @@ export class LocalDbService {
     const batch = `
       BEGIN;
 
-      DELETE FROM product_locations;
-      DELETE FROM products;
-      DELETE FROM shelves;
-      DELETE FROM warehouses;
-
       INSERT OR IGNORE INTO warehouses
       (id, code, name, address, comments, deleted, created_by, created_at, updated_at, pending_sync)
       VALUES
       ('W-0001','BOD-NORTE','Bodega Norte','Av. Norte 123','Bodega principal zona norte',0,'seed',
-       '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
+      '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
       ('W-0002','BOD-SUR','Bodega Sur','Camino Sur km 5','Bodega secundaria zona sur',0,'seed',
-       '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0);
+      '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0);
 
       INSERT OR IGNORE INTO shelves
       (id, warehouse_id, code, name, area, qr_text, comments, deleted, created_by, created_at, updated_at, pending_sync)
       VALUES
-      ('S-0001','W-0001','A-01','Pasillo A Estante 1','A','QR_BOD-NORTE_A-01','Zona recepción',0,'seed',
-       '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
-      ('S-0002','W-0001','A-02','Pasillo A Estante 2','A','QR_BOD-NORTE_A-02',NULL,0,'seed',
-       '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
-      ('S-0003','W-0001','B-01','Pasillo B Estante 1','B','QR_BOD-NORTE_B-01',NULL,0,'seed',
-       '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
-      ('S-0004','W-0002','A-01','Pasillo A Estante 1','A','QR_BOD-SUR_A-01','Cerca de despacho',0,'seed',
-       '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
-      ('S-0005','W-0002','C-01','Pasillo C Estante 1','C','QR_BOD-SUR_C-01',NULL,0,'seed',
-       '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0);
+      ('S-0001','W-0001','A-01','Pasillo A Estante 1','A','SHELF|BOD-NORTE|A-01','Zona recepción',0,'seed',
+      '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
+      ('S-0002','W-0001','A-02','Pasillo A Estante 2','A','SHELF|BOD-NORTE|A-02',NULL,0,'seed',
+      '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
+      ('S-0003','W-0001','B-01','Pasillo B Estante 1','B','SHELF|BOD-NORTE|B-01',NULL,0,'seed',
+      '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
+      ('S-0004','W-0002','A-01','Pasillo A Estante 1','A','SHELF|BOD-SUR|A-01','Cerca de despacho',0,'seed',
+      '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0),
+      ('S-0005','W-0002','C-01','Pasillo C Estante 1','C','SHELF|BOD-SUR|C-01',NULL,0,'seed',
+      '2025-01-01T00:00:00.000Z','2025-01-01T00:00:00.000Z',0);
 
       INSERT OR IGNORE INTO products
       (id, code, name, description, min_stock, comments, deleted, created_by, created_at, updated_at, pending_sync)
       VALUES
       ('P-1001','P-1001','Alcohol Gel 500ml','Alcohol gel para manos 70%',10,NULL,0,'seed',
-       '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
+      '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
       ('P-1002','P-1002','Mascarilla N95','Caja x 20 unidades',20,NULL,0,'seed',
-       '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
+      '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
       ('P-1003','P-1003','Guantes Nitrilo M','Caja x 100 unidades',15,'Color azul',0,'seed',
-       '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
+      '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
       ('P-1004','P-1004','Suero Fisiológico 500ml','Bolsa 0.9% NaCl',8,NULL,0,'seed',
-       '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
+      '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0),
       ('P-1005','P-1005','Tegaderm 10x12','Apósito transparente estéril',12,NULL,0,'seed',
-       '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0);
+      '2025-02-01T00:00:00.000Z','2025-02-01T00:00:00.000Z',0);
 
       INSERT OR IGNORE INTO product_locations
       (id, product_id, shelf_id, quantity, comments, deleted, created_by, created_at, updated_at, pending_sync)
       VALUES
       ('L-0001','P-1001','S-0001',35,'Ingreso reciente',0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
       ('L-0002','P-1001','S-0004',15,NULL,0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
-
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
       ('L-0003','P-1002','S-0002',80,NULL,0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
-
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
       ('L-0004','P-1003','S-0002',50,'Caja abierta',0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
       ('L-0005','P-1003','S-0005',40,NULL,0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
-
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
       ('L-0006','P-1004','S-0003',22,NULL,0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
-
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
       ('L-0007','P-1005','S-0001',18,NULL,0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0),
       ('L-0008','P-1005','S-0004',12,'Reserva para despacho',0,'seed',
-       '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0);
+      '2025-03-01T00:00:00.000Z','2025-03-01T00:00:00.000Z',0);
 
       COMMIT;
     `;
     await this.execute(batch);
-  }
+}
+
 
   // ========= UTILIDADES =========
   private nowIso() {
@@ -351,4 +351,40 @@ export class LocalDbService {
     const sql = `SELECT * FROM scans ORDER BY created_at DESC;`;
     return await this.query(sql);
   }
+    // ========= BÚSQUEDA DE PRODUCTOS (para sugerencias) =========
+  async searchProducts(term: string): Promise<Product[]> {
+    const like = `%${term}%`;
+    return this.query<Product>(
+      `SELECT id, code, name, description, min_stock
+       FROM products
+       WHERE deleted = 0
+         AND (code LIKE ? OR name LIKE ?)
+       ORDER BY name
+       LIMIT 15`,
+      [like, like]
+    );
+  }
+
+  // ========= ELIMINAR PRODUCTO DE UN ESTANTE =========
+  async removeProductFromShelf(productId: string, shelfId: string): Promise<void> {
+    await this.run(
+      `UPDATE product_locations
+         SET deleted = 1,
+             pending_sync = 1
+       WHERE product_id = ? AND shelf_id = ?`,
+      [productId, shelfId]
+    );
+  }
+
+  // (opcional) helper para volver a marcar como no borrado si quisieras reactivar
+  async restoreProductOnShelf(productId: string, shelfId: string): Promise<void> {
+    await this.run(
+      `UPDATE product_locations
+         SET deleted = 0,
+             pending_sync = 1
+       WHERE product_id = ? AND shelf_id = ?`,
+      [productId, shelfId]
+    );
+  }
+
 }

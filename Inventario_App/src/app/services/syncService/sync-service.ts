@@ -2,123 +2,167 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { LocalDbService } from '../db-local/db-local';
+import { environment } from 'src/environments/environment';
 
-const SUPABASE_URL = 'https://ljtfuqtrsednjalrcihp.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqdGZ1cXRyc2VkbmphbHJjaWhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjU1NjMzMjgsImV4cCI6MjA0MTEzOTMyOH0.tDvntBLjzoRP77-HVCltjb-27N365uu7x3Tx7qZ6X5Q';
+
+const SUPABASE_URL = environment.SUPABASE_URL;
+const SUPABASE_KEY = environment.SUPABASE_ANON_KEY;
 
 const H = new HttpHeaders({
   apikey: SUPABASE_KEY,
   Authorization: `Bearer ${SUPABASE_KEY}`,
-  Prefer: 'return=representation,resolution=merge-duplicates',
-  'Content-Type': 'application/json'
+  Prefer: 'return=representation',
+  'Content-Type': 'application/json',
 });
-
-type TableName = 'warehouses' | 'shelves' | 'products' | 'product_locations';
 
 @Injectable({ providedIn: 'root' })
 export class SyncService {
-  constructor(private http: HttpClient, private db: LocalDbService) {}
+  private readonly baseUrl = `${SUPABASE_URL}/rest/v1`;
 
-  async syncAll() {
-    // PUSH (orden: maestras → dependientes)
-    await this.pushTable('warehouses');
-    await this.pushTable('shelves');
-    await this.pushTable('products');
-    await this.pushTable('product_locations');
+  constructor(
+    private http: HttpClient,
+    private db: LocalDbService
+  ) {}
 
-    // PULL
-    await this.pullTable('warehouses');
-    await this.pullTable('shelves');
-    await this.pullTable('products');
-    await this.pullTable('product_locations');
+  /**
+   * Sincroniza SOLO product_locations (ubicaciones).
+   * Se puede llamar después de agregar productos a un estante.
+   */
+  async syncAll(): Promise<void> {
+    try {
+      await this.pushLocations();
+      await this.pullLocations();
 
-    await this.db.run(
-      `update meta_sync set value=? where key='last_pull'`,
-      [new Date().toISOString()]
-    );
+      await this.db.run(
+        `UPDATE meta_sync SET value=? WHERE key='last_pull'`,
+        [new Date().toISOString()]
+      );
+    } catch (err) {
+      console.error('Error en syncAll:', err);
+      throw err;
+    }
   }
 
-  private async pushTable(table: TableName) {
-    const rows = await this.db.query<any>(`select * from ${table} where pending_sync=1`);
+  // ========== PUSH: locales → Supabase ==========
+  private async pushLocations(): Promise<void> {
+    const rows = await this.db.query<any>(
+      `SELECT id, product_id, shelf_id, quantity, comments, deleted,
+              created_by, created_at, updated_at
+         FROM product_locations
+        WHERE pending_sync = 1`
+    );
+
     if (!rows.length) return;
 
-    const url = `${SUPABASE_URL}/rest/v1/inventory.${table}`;
-    // normaliza boolean/integer → boolean en remoto
-    const body = rows.map(r => ({
-      ...r,
-      deleted: !!r.deleted,
-      // deja comments/address/area/qr_text tal cual (pueden ser null)
-      created_at: r.created_at,
-      updated_at: r.updated_at
-    }));
-    await this.http.post(url, body, { headers: H }).toPromise();
+    for (const r of rows) {
+      const payload = {
+        id: r.id,
+        product_id: r.product_id,
+        shelf_id: r.shelf_id,
+        quantity: r.quantity ?? 0,
+        comments: r.comments ?? null,
+        deleted: !!r.deleted,
+        created_by: r.created_by ?? null,
+        created_at: r.created_at,
+        updated_at: r.updated_at,
+      };
 
-    const ids = rows.map(r => r.id);
-    const placeholders = ids.map(() => '?').join(',');
-    await this.db.run(`update ${table} set pending_sync=0 where id in (${placeholders})`, ids);
+      try {
+        // 1) Intentar actualizar (PATCH) por id
+        await this.http
+          .patch(
+            `${this.baseUrl}/product_locations?id=eq.${encodeURIComponent(r.id)}`,
+            payload,
+            { headers: H }
+          )
+          .toPromise();
+      } catch (err: any) {
+        // Si no existe (404) → crearlo con POST
+        if (err?.status === 404) {
+          await this.http
+            .post(`${this.baseUrl}/product_locations`, [payload], { headers: H })
+            .toPromise();
+        } else {
+          console.error('Error en pushLocations para id', r.id, err);
+          throw err;
+        }
+      }
+
+      // Si llegó aquí, la fila se sincronizó
+      await this.db.run(
+        `UPDATE product_locations SET pending_sync = 0 WHERE id = ?`,
+        [r.id]
+      );
+    }
   }
 
-  private async pullTable(table: TableName) {
-    const lastPull = (await this.db.query<{ value: string }>(
-      `select value from meta_sync where key='last_pull'`
-    ))[0]?.value || '1970-01-01T00:00:00.000Z';
+  // ========== PULL: Supabase → local ==========
+  private async pullLocations(): Promise<void> {
+    const lastPullRow = await this.db.query<{ value: string }>(
+      `SELECT value FROM meta_sync WHERE key='last_pull'`
+    );
+    const lastPull =
+      lastPullRow[0]?.value || '1970-01-01T00:00:00.000Z';
 
-    const url = `${SUPABASE_URL}/rest/v1/inventory.${table}`;
     const params = new HttpParams()
       .set('select', '*')
       .set('updated_at', `gt.${lastPull}`)
       .set('order', 'updated_at.asc')
       .set('limit', 1000);
 
-    const serverRows = (await this.http.get<any[]>(url, { headers: H, params }).toPromise()) ?? [];
+    const url = `${this.baseUrl}/product_locations`;
+    const serverRows =
+      (await this.http
+        .get<any[]>(url, { headers: H, params })
+        .toPromise()) ?? [];
 
     for (const r of serverRows) {
       const exists = await this.db.query<{ id: string }>(
-        `select id from ${table} where id=?`, [r.id]
+        `SELECT id FROM product_locations WHERE id = ?`,
+        [r.id]
       );
 
       if (exists.length) {
         await this.db.run(
-          `update ${table}
-             set code = coalesce(? , code),
-                 name = coalesce(? , name),
-                 address = coalesce(? , address),
-                 warehouse_id = coalesce(? , warehouse_id),
-                 area = coalesce(? , area),
-                 qr_text = coalesce(? , qr_text),
-                 description = coalesce(? , description),
-                 min_stock = coalesce(? , min_stock),
-                 product_id = coalesce(? , product_id),
-                 shelf_id   = coalesce(? , shelf_id),
-                 quantity   = coalesce(? , quantity),
-                 comments   = ?,
-                 deleted    = ?,
-                 created_by = ?,
-                 created_at = ?,
-                 updated_at = ?,
-                 pending_sync = 0
-           where id = ?`,
+          `UPDATE product_locations
+              SET product_id = ?,
+                  shelf_id   = ?,
+                  quantity   = ?,
+                  comments   = ?,
+                  deleted    = ?,
+                  created_by = ?,
+                  created_at = ?,
+                  updated_at = ?,
+                  pending_sync = 0
+            WHERE id = ?`,
           [
-            r.code ?? null, r.name ?? null, r.address ?? null,
-            r.warehouse_id ?? null, r.area ?? null, r.qr_text ?? null,
-            r.description ?? null, r.min_stock ?? null, r.product_id ?? null,
-            r.shelf_id ?? null, r.quantity ?? null,
+            r.product_id,
+            r.shelf_id,
+            r.quantity ?? 0,
             r.comments ?? null,
-            r.deleted ? 1 : 0, r.created_by ?? null, r.created_at, r.updated_at, r.id
+            r.deleted ? 1 : 0,
+            r.created_by ?? null,
+            r.created_at,
+            r.updated_at,
+            r.id,
           ]
         );
       } else {
         await this.db.run(
-          `insert into ${table}
-            (id, code, name, address, warehouse_id, area, qr_text, description, min_stock,
-             product_id, shelf_id, quantity, comments, deleted, created_by, created_at, updated_at, pending_sync)
-           values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+          `INSERT INTO product_locations
+             (id, product_id, shelf_id, quantity, comments, deleted,
+              created_by, created_at, updated_at, pending_sync)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
           [
-            r.id, r.code ?? null, r.name ?? null, r.address ?? null,
-            r.warehouse_id ?? null, r.area ?? null, r.qr_text ?? null, r.description ?? null,
-            r.min_stock ?? null, r.product_id ?? null, r.shelf_id ?? null, r.quantity ?? null,
+            r.id,
+            r.product_id,
+            r.shelf_id,
+            r.quantity ?? 0,
             r.comments ?? null,
-            r.deleted ? 1 : 0, r.created_by ?? null, r.created_at, r.updated_at
+            r.deleted ? 1 : 0,
+            r.created_by ?? null,
+            r.created_at,
+            r.updated_at,
           ]
         );
       }

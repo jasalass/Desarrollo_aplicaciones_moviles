@@ -31,7 +31,7 @@ export class LoginPage {
     });
   }
 
-  // 👇 ESTOS GETTERS SON LOS QUE FALTAN
+  
   get emailCtrl() { return this.loginForm.get('email'); }
   get passwordCtrl() { return this.loginForm.get('password'); }
 

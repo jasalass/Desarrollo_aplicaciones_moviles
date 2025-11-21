@@ -1,23 +1,234 @@
-<ion-content class="ion-padding">
-  <ion-button expand="block" color="primary" (click)="startScan()" [disabled]="scanning">
-    {{ scanning ? 'Escaneando...' : 'Iniciar Escaneo' }}
-  </ion-button>
+<ion-header translucent>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Escanear estante</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-  <ion-text color="medium" *ngIf="scannedText">
-    <p><strong>Último escaneo:</strong></p>
-    <p>{{ scannedText }}</p>
-  </ion-text>
+<ion-content [fullscreen]="true" class="ion-padding scan-page">
 
-  <hr>
+  <!-- INTRO ESTANTE -->
+  <section class="hero">
+    <h2>Ubica y administra un estante</h2>
+    <p>
+      Escanea primero el código QR del estante. Luego podrás agregar productos
+      por QR o desde el catálogo.
+    </p>
+  </section>
 
-  <ion-text *ngIf="allScans.length > 0">
-    <p><strong>Historial de escaneos guardados:</strong></p>
-    <ul>
-      <li *ngFor="let s of allScans">{{ s.created_at | date:'short' }} — {{ s.content }}</li>
-    </ul>
-  </ion-text>
+  <!-- BOTÓN ESCANEAR ESTANTE -->
+  <div class="scan-action">
+    <ion-button expand="block" size="large" shape="round" (click)="scanShelf()" [disabled]="isScanningShelf">
+      <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+      {{ isScanningShelf ? 'Escaneando estante...' : 'Escanear estante (QR)' }}
+      <ion-spinner slot="end" *ngIf="isScanningShelf" name="crescent">
+      </ion-spinner>
+    </ion-button>
 
-  <ion-text color="medium" *ngIf="!allScans.length">
-    <p>No hay escaneos guardados aún.</p>
-  </ion-text>
+    <p class="hint">
+      El QR del estante debe estar bien enfocado y visible.
+    </p>
+  </div>
+
+  <!-- DATOS DEL ESTANTE + PRODUCTOS -->
+  <section *ngIf="shelf" class="result-block">
+    <ion-card class="shelf-card">
+      <ion-card-header>
+        <ion-card-title>
+          Estante {{ shelf.code }}
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="shelf-name">{{ shelf.name }}</p>
+        <p class="shelf-meta" *ngIf="shelf.area">
+          Área / pasillo: <strong>{{ shelf.area }}</strong>
+        </p>
+        <p class="shelf-meta" *ngIf="lastQrContent">
+          QR leído:
+          <span class="qr-text">{{ lastQrContent }}</span>
+        </p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Productos actuales del estante -->
+    <ion-card class="products-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="cube-outline"></ion-icon>
+          Productos en este estante
+        </ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <ion-list *ngIf="shelfProducts.length; else noProducts">
+          <ion-item *ngFor="let p of shelfProducts">
+            <ion-label>
+              <h3>{{ p.name }}</h3>
+              <p>Código: {{ p.code }}</p>
+            </ion-label>
+            <ion-text slot="end" class="qty">
+              x{{ p.quantity }}
+            </ion-text>
+            <ion-button fill="clear" color="danger" slot="end" (click)="removeProductFromShelf(p)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        </ion-list>
+
+        <ng-template #noProducts>
+          <div class="empty-state">
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <p>Este estante aún no tiene productos registrados.</p>
+          </div>
+        </ng-template>
+      </ion-card-content>
+    </ion-card>
+  </section>
+
+  <!-- Si escaneó algo pero no se encontró estante -->
+  <section *ngIf="!shelf && lastQrContent && !isScanningShelf" class="result-block">
+    <ion-card class="warning-card">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          QR de estante no reconocido
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p>No se encontró ningún estante asociado a este código.</p>
+        <p class="qr-text">QR leído: {{ lastQrContent }}</p>
+      </ion-card-content>
+    </ion-card>
+  </section>
+
+  <!-- BLOQUE: AGREGAR PRODUCTOS (solo si ya hay estante) -->
+  <section *ngIf="shelf" class="add-block">
+
+    <h3>Agregar productos a este estante</h3>
+
+    <!-- Selector de modo -->
+    <ion-segment [value]="addMode"  (ionChange)="onModeChange($event)">>
+      <ion-segment-button value="qr">
+        <ion-icon name="qr-code-outline"></ion-icon>
+        QR producto
+      </ion-segment-button>
+      <ion-segment-button value="form">
+        <ion-icon name="search-outline"></ion-icon>
+        Catálogo / formulario
+      </ion-segment-button>
+    </ion-segment>
+
+
+    <!-- Modo: QR producto -->
+    <div *ngIf="addMode === 'qr'" class="mode-container">
+      <p class="hint">
+        Escanea el código QR de un producto para agregarlo directamente a este estante.
+      </p>
+
+      <ion-button expand="block" shape="round" (click)="scanProductQr()" [disabled]="isScanningProduct">
+        <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+        {{ isScanningProduct ? 'Escaneando producto...' : 'Escanear QR de producto' }}
+        <ion-spinner slot="end" *ngIf="isScanningProduct" name="crescent">
+        </ion-spinner>
+      </ion-button>
+    </div>
+
+    <!-- Modo: FORMULARIO -->
+    <div *ngIf="addMode === 'form'" class="mode-container">
+
+      <!-- Campo de búsqueda con sugerencias -->
+      <ion-item>
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+        <ion-input label="Buscar por código o nombre" labelPlacement="stacked" placeholder="Ej: P-1001 o 'Alcohol'"
+          [value]="productForm.get('search')?.value"
+          (ionInput)="productForm.get('search')?.setValue($event.detail.value); onSearchChange($event)">
+        </ion-input>
+        <ion-spinner slot="end" *ngIf="isSearching" name="crescent">
+        </ion-spinner>
+      </ion-item>
+
+      <ion-list *ngIf="suggestions.length" class="suggestions">
+        <ion-item button detail="false" *ngFor="let s of suggestions" (click)="selectSuggestion(s)">
+          <ion-label>
+            <h3>{{ s.name }}</h3>
+            <p>Código: {{ s.code }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Formulario de producto -->
+      <form [formGroup]="productForm" class="product-form">
+        <ion-item>
+          <ion-input label="Código" labelPlacement="stacked" formControlName="code" placeholder="Ej: P-2001">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Nombre" labelPlacement="stacked" formControlName="name" placeholder="Nombre del producto">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Descripción" labelPlacement="stacked" formControlName="description" placeholder="Opcional">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input type="number" label="Stock mínimo" labelPlacement="stacked" formControlName="minStock">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input type="number" label="Cantidad a agregar" labelPlacement="stacked" formControlName="quantity">
+          </ion-input>
+        </ion-item>
+
+        <div class="form-actions">
+          <ion-button expand="block" shape="round" color="primary" (click)="addPendingItem()">
+            <ion-icon slot="start" [name]="editingIndex !== null ? 'create-outline' : 'add-circle-outline'"></ion-icon>
+            {{ editingIndex !== null ? 'Actualizar en lista' : 'Agregar a lista' }}
+          </ion-button>
+        </div>
+      </form>
+
+      <!-- Lista de productos pendientes -->
+      <ion-card *ngIf="pendingItems.length" class="pending-card">
+        <ion-card-header>
+          <ion-card-title>Productos pendientes</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-list>
+            <ion-item *ngFor="let p of pendingItems; let i = index">
+              <ion-label>
+                <h3>{{ p.name }}</h3>
+                <p>Código: {{ p.code }}</p>
+                <p *ngIf="p.description">Descr.: {{ p.description }}</p>
+              </ion-label>
+              <ion-text slot="end" class="qty">
+                x{{ p.quantity }}
+              </ion-text>
+              <ion-button fill="clear" size="small" slot="end" (click)="editPendingItem(i)">
+                <ion-icon name="create-outline"></ion-icon>
+              </ion-button>
+              <ion-button fill="clear" size="small" color="danger" slot="end" (click)="removePendingItem(i)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+
+          <ion-button expand="block" shape="round" color="success" (click)="savePendingToShelf()">
+            Guardar todos en el estante
+          </ion-button>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </section>
+
+  <!-- TOAST -->
+  <ion-toast [isOpen]="isToastOpen" [message]="toastMessage" [duration]="2200" color="medium" position="bottom"
+    (didDismiss)="isToastOpen = false">
+  </ion-toast>
+
 </ion-content>

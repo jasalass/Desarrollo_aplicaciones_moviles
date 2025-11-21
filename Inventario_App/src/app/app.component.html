@@ -1,88 +1,9 @@
 <ion-app>
-  <!-- Menú lateral -->
-  <ion-menu contentId="main-content">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Menú</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="ion-padding">
-      <ion-accordion-group>
-  <!-- Productos -->
-  <ion-accordion value="productos">
-    <ion-item slot="header">
-      <ion-label>Gestión de Productos</ion-label>
-    </ion-item>
-    <div class="ion-padding" slot="content">
-      <ion-list lines="none">
-        <ion-item button (click)="goAddProduct()">Agregar producto</ion-item>
-        <ion-item button (click)="goSearchProduct()">Buscar producto</ion-item>
-        <ion-item button>Editar producto</ion-item>
-        <ion-item button>Eliminar producto</ion-item>
-      </ion-list>
-    </div>
-  </ion-accordion>
-
-  <!-- Estantes -->
-  <ion-accordion value="estantes">
-    <ion-item slot="header">
-      <ion-label>Gestión de Estantes</ion-label>
-    </ion-item>
-    <div class="ion-padding" slot="content">
-      <ion-list lines="none">
-        <ion-item button (click)="goScan()">Escanear estante (QR)</ion-item>
-        <ion-item button>Consultar estante activo</ion-item>
-        <ion-item button>Mover producto entre estantes</ion-item>
-      </ion-list>
-    </div>
-  </ion-accordion>
-
-  <!-- Reportes -->
-  <ion-accordion value="reportes">
-    <ion-item slot="header">
-      <ion-label>Reportes</ion-label>
-    </ion-item>
-    <div class="ion-padding" slot="content">
-      <ion-list lines="none">
-        <ion-item button>Stock bajo mínimos</ion-item>
-        <ion-item button>Productos sin ubicación</ion-item>
-        <ion-item button>Resumen inventario</ion-item>
-      </ion-list>
-    </div>
-  </ion-accordion>
-
-  <!-- Usuarios -->
-  <ion-accordion value="usuarios">
-    <ion-item slot="header">
-      <ion-label>Usuarios</ion-label>
-    </ion-item>
-    <div class="ion-padding" slot="content">
-      <ion-list lines="none">
-        <ion-item button>Perfil</ion-item>
-        <ion-item button>Roles</ion-item>
-        <ion-item button>Salir</ion-item>
-      </ion-list>
-    </div>
-  </ion-accordion>
-</ion-accordion-group>
-
-    </ion-content>
-  </ion-menu>
-
-  <!-- Contenido principal con router-outlet -->
-  <div class="ion-page" id="main-content">
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button></ion-menu-button>
-        </ion-buttons>
-        <ion-title>Menu</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
+  
+ 
     <ion-content class="ion-padding">
       <!-- Aquí se cargan las vistas con router -->
       <ion-router-outlet></ion-router-outlet>
     </ion-content>
-  </div>
+  
 </ion-app>
