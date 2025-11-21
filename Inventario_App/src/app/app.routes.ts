@@ -22,5 +22,11 @@ export const routes: Routes = [
     loadComponent: () => import('./perfil/perfil.page').then( m => m.PerfilPage),
     canActivate: [AuthGuard], 
   },
+  {
+    path: 'buscar-producto',
+    loadComponent: () => import('./buscar-producto/buscar-producto.page').then( m => m.BuscarProductoPage),
+    canActivate: [AuthGuard],
+  },
+
 
 ];

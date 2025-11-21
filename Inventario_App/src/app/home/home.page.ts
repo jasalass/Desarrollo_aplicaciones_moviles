@@ -161,7 +161,7 @@ export class HomePage {
   }
 
   goSearchProduct() {
-    this.openToast('Buscar producto: pendiente');
+    this.router.navigateByUrl('/buscar-producto');
   }
 
   // === Sincronización Supabase → SQLite ===
@@ -196,4 +196,6 @@ export class HomePage {
       this.isLoadingWarehouses = false;
     }
   }
+
+  
 }

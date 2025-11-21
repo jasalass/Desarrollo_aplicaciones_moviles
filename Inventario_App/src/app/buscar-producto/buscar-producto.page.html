@@ -1,0 +1,110 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Buscar producto</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="buscar-wrapper ion-padding">
+
+  <!-- Encabezado -->
+  <section class="buscar-header">
+    <h2>Encuentra un producto</h2>
+    <p>
+      Busca por <strong>código</strong> o <strong>nombre</strong> para ver
+      en qué bodega y estante se encuentra, junto con su stock.
+    </p>
+  </section>
+
+  <!-- Barra de búsqueda -->
+  <section class="buscar-search">
+    <ion-searchbar
+      placeholder="Ej: P-1001 o 'Mascarilla'"
+      [debounce]="400"
+      [value]="term"
+      (ionChange)="onSearch($event)">
+    </ion-searchbar>
+  </section>
+
+  <!-- Estado de carga -->
+  <div class="buscar-loading" *ngIf="isSearching">
+    <ion-spinner name="lines"></ion-spinner>
+    <p>Buscando productos...</p>
+  </div>
+
+  <!-- Mensajes cuando no hay resultados -->
+  <ng-container *ngIf="!isSearching">
+
+    <div class="buscar-empty" *ngIf="hasSearched && !results.length && term.length >= 2">
+      <ion-icon name="search-outline"></ion-icon>
+      <p>No se encontraron productos para “{{ term }}”.</p>
+      <p class="hint">Verifica el código o prueba con otra palabra clave.</p>
+    </div>
+
+    <div class="buscar-empty" *ngIf="!hasSearched || term.length < 2">
+      <ion-icon name="search-outline"></ion-icon>
+      <p>Escribe al menos 2 caracteres para iniciar la búsqueda.</p>
+    </div>
+
+  </ng-container>
+
+  <!-- Resultados -->
+  <section *ngIf="results.length" class="buscar-resultados">
+    <ion-card
+      class="producto-card"
+      *ngFor="let p of results">
+
+      <ion-card-header>
+        <div class="producto-header">
+          <div class="producto-icon">
+            <ion-icon name="cube-sharp"></ion-icon>
+          </div>
+          <div>
+            <ion-card-title>{{ p.name }}</ion-card-title>
+            <p class="producto-code">Código: {{ p.code }}</p>
+          </div>
+        </div>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- Descripción y datos base -->
+        <div class="producto-info">
+          <p *ngIf="p.description" class="producto-desc">
+            {{ p.description }}
+          </p>
+          <p class="producto-min-stock">
+            Stock mínimo recomendado: <strong>{{ p.minStock }}</strong>
+          </p>
+        </div>
+
+        <!-- Ubicaciones -->
+        <div class="producto-ubicaciones" *ngIf="p.locations.length; else sinUbicaciones">
+          <h3>Ubicaciones</h3>
+          <ion-list lines="none">
+            <ion-item *ngFor="let loc of p.locations" class="ubicacion-item">
+              <ion-icon slot="start" name="business-outline"></ion-icon>
+              <ion-label>
+                <h4>{{ loc.warehouseName || loc.warehouseCode }}</h4>
+                <p class="ubicacion-detalle">
+                  Estante <strong>{{ loc.shelfCode }}</strong>
+                  <span *ngIf="loc.shelfName"> · {{ loc.shelfName }}</span>
+                </p>
+                <p class="ubicacion-detalle">
+                  Cantidad: <strong>{{ loc.quantity }}</strong>
+                </p>
+                <p class="ubicacion-direccion" *ngIf="loc.address">
+                  {{ loc.address }}
+                </p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </div>
+
+        <ng-template #sinUbicaciones>
+          <div class="producto-sin-ubicaciones">
+            <p>Este producto aún no tiene ubicaciones asignadas en estantes.</p>
+          </div>
+        </ng-template>
+      </ion-card-content>
+    </ion-card>
+  </section>
+</ion-content>
