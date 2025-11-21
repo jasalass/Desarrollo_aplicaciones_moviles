@@ -1,0 +1,91 @@
+ion-content {
+  --background: #020617;
+}
+
+.perfil-content {
+  padding: 1.2rem 1.2rem 1.6rem;
+}
+
+.perfil-header {
+  text-align: center;
+  margin: 1rem 0 1.4rem;
+}
+
+.perfil-avatar {
+  width: 78px;
+  height: 78px;
+  border-radius: 999px;
+  margin: 0 auto 0.7rem;
+  background: radial-gradient(circle at 30% 20%, #38bdf8, #1d4ed8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f9fafb;
+  font-weight: 700;
+  font-size: 1.6rem;
+  box-shadow: 0 16px 50px rgba(15, 23, 42, 0.9);
+}
+
+.perfil-header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.perfil-email {
+  margin-top: 0.15rem;
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.perfil-card {
+  border-radius: 18px;
+  margin-bottom: 1rem;
+  background: #020617;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.perfil-card ion-card-header {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.perfil-card ion-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.perfil-card p {
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.perfil-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.perfil-form ion-input {
+  --background: rgba(15, 23, 42, 0.85);
+  --border-radius: 14px;
+  --padding-start: 0.8rem;
+  --padding-end: 0.8rem;
+  --color: #e5e7eb;
+  --placeholder-color: #6b7280;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.perfil-form ion-button {
+  --border-radius: 999px;
+  margin-top: 0.4rem;
+}
+
+ion-text[color="danger"] small {
+  font-size: 0.75rem;
+}
+
+.perfil-card-actions ion-button {
+  --border-radius: 999px;
+}

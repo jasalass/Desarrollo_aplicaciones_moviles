@@ -1,56 +1,87 @@
-<ion-content [fullscreen]="true">
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="form">
+<ion-content [fullscreen]="true" class="auth-content">
+  <div class="auth-gradient"></div>
 
-    <!-- EMAIL -->
-    <ion-input
-      type="email"
-      placeholder="usuario@correo.com"
-      formControlName="email"
-      inputmode="email"
-      autocomplete="email"
-      autocapitalize="off"
-      [clearInput]="true">
-    </ion-input>
-    <ion-text color="danger" *ngIf="emailCtrl?.touched && emailCtrl?.invalid">
-      <ng-container *ngIf="emailCtrl?.errors?.['required']">
-        El correo es obligatorio.
-      </ng-container>
-      <ng-container *ngIf="emailCtrl?.errors?.['email']">
-        Ingresa un correo válido (usuario@dominio.com).
-      </ng-container>
-    </ion-text>
+  <div class="auth-wrapper">
+    <div class="auth-card">
 
-    <!-- PASSWORD -->
-    <ion-input
-      type="password"
-      placeholder="**********"
-      formControlName="password"
-      autocomplete="new-password"
-      [clearInput]="true">
-    </ion-input>
-    <ion-text color="danger" *ngIf="passwordCtrl?.touched && passwordCtrl?.invalid">
-      <ng-container *ngIf="passwordCtrl?.errors?.['required']">
-        La contraseña es obligatoria.
-      </ng-container>
-      <ng-container *ngIf="passwordCtrl?.errors?.['minlength']">
-        Debe tener al menos 6 caracteres.
-      </ng-container>
-      <ng-container *ngIf="passwordCtrl?.errors?.['maxlength']">
-        No puede exceder 12 caracteres.
-      </ng-container>
-    </ion-text>
+      <div class="auth-header">
+        <h1>Crear cuenta</h1>
+        <p>Regístrate para comenzar a registrar tus bodegas y estantes.</p>
+      </div>
 
-    <div class="mt-3">
-      <ion-button shape="round" expand="block" type="submit" [disabled]="registerForm.invalid">
-        Registrarse
-      </ion-button>
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+        <!-- EMAIL -->
+        <div class="field-group">
+          <label class="field-label">Correo electrónico</label>
+          <ion-input
+            type="email"
+            placeholder="usuario@correo.com"
+            formControlName="email"
+            inputmode="email"
+            autocomplete="email"
+            autocapitalize="off"
+            [clearInput]="true">
+          </ion-input>
+          <ion-text color="danger" *ngIf="emailCtrl?.touched && emailCtrl?.invalid">
+            <ng-container *ngIf="emailCtrl?.errors?.['required']">
+              El correo es obligatorio.
+            </ng-container>
+            <ng-container *ngIf="emailCtrl?.errors?.['email']">
+              Ingresa un correo válido (usuario@dominio.com).
+            </ng-container>
+          </ion-text>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="field-group">
+          <label class="field-label">Contraseña</label>
+          <ion-input
+            type="password"
+            placeholder="••••••••"
+            formControlName="password"
+            autocomplete="new-password"
+            [clearInput]="true">
+          </ion-input>
+          <ion-text color="danger" *ngIf="passwordCtrl?.touched && passwordCtrl?.invalid">
+            <ng-container *ngIf="passwordCtrl?.errors?.['required']">
+              La contraseña es obligatoria.
+            </ng-container>
+            <ng-container *ngIf="passwordCtrl?.errors?.['minlength']">
+              Debe tener al menos 6 caracteres.
+            </ng-container>
+            <ng-container *ngIf="passwordCtrl?.errors?.['maxlength']">
+              No puede exceder 12 caracteres.
+            </ng-container>
+          </ion-text>
+        </div>
+
+        <ion-button
+          shape="round"
+          expand="block"
+          type="submit"
+          [disabled]="registerForm.invalid"
+          class="auth-main-button">
+          Registrarse
+        </ion-button>
+
+        <div class="auth-links">
+          <button type="button" class="link-button" [routerLink]="['/login']">
+            ¿Ya tienes cuenta? Inicia sesión
+          </button>
+        </div>
+      </form>
+
+      <div class="auth-footer">
+        <p>Inventario Clínico · Alta trazabilidad desde el inicio.</p>
+      </div>
     </div>
-  </form>
-</ion-content>
+  </div>
 
-<ion-toast
-  [isOpen]="isToastOpen"
-  [message]="toastMessage"
-  [duration]="toastDuration"
-  (didDismiss)="isToastOpen = false">
-</ion-toast>
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMessage"
+    [duration]="toastDuration"
+    (didDismiss)="isToastOpen = false">
+  </ion-toast>
+</ion-content>

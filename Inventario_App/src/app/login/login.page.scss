@@ -1,73 +1,40 @@
-:host { display: block; }
-ion-content { --background: var(--ion-background-color); }
+ion-content {
+  --background: #020617;
+}
 
-/* Estructura simple sobre lo que ya existe */
 .form {
-  width: 100%;
-  max-width: 380px;
-  margin: 10vh auto;
-  padding: 16px;
-  border: 1px solid var(--border, #1f2937);
-  border-radius: 8px;
-  background: var(--ion-background-color);
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
 }
 
-/* Separación vertical mínima */
-.form > * + * { margin-top: 12px; }
-
-/* Campos planos */
 .form ion-input {
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --min-height: 44px;
-  font-size: 0.95rem;
-  background: transparent;
-  border: 1px solid var(--border, #1f2937);
-  border-radius: 8px;
+  --background: rgba(15, 23, 42, 0.85);
+  --border-radius: 14px;
+  --padding-start: 0.9rem;
+  --padding-end: 0.9rem;
+  --color: #e5e7eb;
+  --placeholder-color: #6b7280;
+  border: 1px solid rgba(148, 163, 184, 0.5);
 }
 
-/* Mensajes de error compactos */
-ion-text[color="danger"] {
-  display: block;
-  margin-top: 6px;
-  font-size: 0.88rem;
-}
-
-/* Botones sobrios (sin azul chillón) */
 .form ion-button {
-  --border-radius: 8px;
-  --text-transform: none;
-  --box-shadow: none;
-  height: 44px;
+  --border-radius: 999px;
+  margin-top: 0.4rem;
 }
 
-/* Fuerza un primario neutro aunque el HTML use color="primary" */
-.form ion-button[type="submit"] {
-  --background: #374151 !important;
-  --color: #ffffff !important;
-}
-
-/* Botón secundario (outline discreto) */
-.form ion-button[type="button"] {
-  --background: transparent !important;
-  --border-color: #374151 !important;
-  --color: #e5e7eb !important;
-  --border-width: 1px;
-}
-
-/* Enlace recuperar contraseña */
-a[routerLink] {
+.form a {
   display: inline-block;
-  margin-top: 6px;
-  font-size: 0.92rem;
-  color: #60a5fa;
-  text-decoration: none;
+  margin: 0.5rem 0 0.6rem;
+  font-size: 0.85rem;
+  color: #93c5fd;
+  text-align: center;
 }
-a[routerLink]:hover { text-decoration: underline; }
 
-/* Modo claro */
-@media (prefers-color-scheme: light) {
-  .form { border-color: #e5e7eb; }
-  .form ion-input { border-color: #e5e7eb; }
-  .form ion-button[type="button"] { --color: #374151 !important; }
+ion-text[color="danger"] {
+  font-size: 0.78rem;
+  margin-top: -0.4rem;
 }

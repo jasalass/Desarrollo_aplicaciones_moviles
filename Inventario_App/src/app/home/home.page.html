@@ -1,22 +1,47 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Inicio</ion-title>
+  <ion-toolbar class="home-toolbar">
+    <div class="home-toolbar-left">
+      <ion-title>Inventario</ion-title>
+    </div>
+
+    <div class="home-toolbar-right">
+      <!-- Avatar con inicial -->
+      <button type="button" class="avatar-button" (click)="goPerfil()">
+        <div class="avatar-circle">
+          <span *ngIf="!isLoadingProfile">{{ avatarLetter }}</span>
+        </div>
+      </button>
+
+      <!-- Botón logout -->
+      <ion-button fill="clear" size="small" (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" class="home-content ion-padding">
 
   <!-- Encabezado de bienvenida -->
-  <div class="home-header">
-    <h2>Hola, {{ usuario }} 👋</h2>
-    <p class="home-subtitle">
-      Gestiona el inventario de tus bodegas escaneando, registrando productos
-      y manteniendo todo sincronizado.
+  <section class="home-header">
+    <p class="home-subtitle">Bienvenido(a)</p>
+
+    <div class="home-user-row">
+      <h2 *ngIf="!isLoadingProfile">Hola, {{ displayName }} 👋</h2>
+      <div class="home-user-loading" *ngIf="isLoadingProfile">
+        <ion-spinner name="lines"></ion-spinner>
+        <span>Cargando usuario...</span>
+      </div>
+    </div>
+
+    <p class="home-description">
+      Gestiona el inventario escaneando estantes, registrando productos y manteniendo todo sincronizado
+      con la bodega central.
     </p>
-  </div>
+  </section>
 
   <!-- Acciones principales -->
-  <ion-card class="home-actions">
+  <ion-card class="home-card home-actions">
     <ion-card-header>
       <ion-card-title>Acciones rápidas</ion-card-title>
     </ion-card-header>
@@ -63,7 +88,7 @@
 
     <!-- Lista de bodegas -->
     <ng-container *ngIf="!isLoadingWarehouses">
-      <ion-card *ngIf="!warehouses.length">
+      <ion-card *ngIf="!warehouses.length" class="home-card">
         <ion-card-content>
           Aún no hay bodegas registradas en el sistema.
         </ion-card-content>
@@ -91,10 +116,9 @@
   <ion-toast
     [isOpen]="isToastOpen"
     [message]="toastMessage"
-    [duration]="1800"
+    [duration]="2000"
     color="medium"
     position="bottom"
     (didDismiss)="isToastOpen = false">
   </ion-toast>
-
 </ion-content>

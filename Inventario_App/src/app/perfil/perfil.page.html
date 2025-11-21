@@ -1,0 +1,104 @@
+<ion-header>
+  <ion-toolbar class="perfil-toolbar">
+    <ion-title>Mi perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="perfil-content">
+
+  <!-- Estado de carga inicial -->
+  <div class="perfil-loading" *ngIf="isLoadingProfile">
+    <ion-spinner name="lines"></ion-spinner>
+    <p>Cargando datos de tu cuenta...</p>
+  </div>
+
+  <ng-container *ngIf="!isLoadingProfile">
+    <!-- Encabezado con avatar -->
+    <section class="perfil-header">
+      <div class="perfil-avatar">
+        {{ displayInitial }}
+      </div>
+      <h2>{{ displayName }}</h2>
+      <p class="perfil-email">{{ profile?.email || 'correo@dominio.com' }}</p>
+    </section>
+
+    <!-- Datos actuales -->
+    <ion-card class="perfil-card">
+      <ion-card-header>
+        <ion-card-title>Datos de la cuenta</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Nombre:</strong> {{ profile?.first_name || 'Pendiente' }}</p>
+        <p><strong>Apellido:</strong> {{ profile?.last_name || 'Pendiente' }}</p>
+        <p><strong>Correo:</strong> {{ profile?.email }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Edición de nombre/apellido -->
+    <ion-card class="perfil-card">
+      <ion-card-header>
+        <ion-card-title>Editar perfil</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <form [formGroup]="profileForm" (ngSubmit)="onSaveProfile()" class="perfil-form">
+
+          <ion-input
+            label="Nombres"
+            labelPlacement="stacked"
+            formControlName="first_name"
+            placeholder="Ingresa tus nombres">
+          </ion-input>
+          <ion-text color="danger" *ngIf="firstNameCtrl?.touched && firstNameCtrl?.invalid">
+            <small>Ingresa un nombre válido.</small>
+          </ion-text>
+
+          <ion-input
+            label="Apellidos"
+            labelPlacement="stacked"
+            formControlName="last_name"
+            placeholder="Ingresa tus apellidos">
+          </ion-input>
+          <ion-text color="danger" *ngIf="lastNameCtrl?.touched && lastNameCtrl?.invalid">
+            <small>Ingresa un apellido válido.</small>
+          </ion-text>
+
+          <ion-button
+            type="submit"
+            expand="block"
+            shape="round"
+            [disabled]="isSaving || profileForm.invalid">
+            <ion-spinner *ngIf="isSaving" name="lines" slot="start"></ion-spinner>
+            Guardar cambios
+          </ion-button>
+        </form>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Acciones -->
+    <ion-card class="perfil-card perfil-card-actions">
+      <ion-card-header>
+        <ion-card-title>Sesión</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-button
+          expand="block"
+          color="danger"
+          shape="round"
+          (click)="logout()">
+          Cerrar sesión
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <!-- Toast -->
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMessage"
+    [color]="toastColor"
+    [duration]="2200"
+    position="bottom"
+    (didDismiss)="isToastOpen = false">
+  </ion-toast>
+
+</ion-content>

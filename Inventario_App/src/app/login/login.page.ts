@@ -1,16 +1,33 @@
+// src/app/login/login.page.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
-import { LoadingController, IonContent, IonButton, IonInput, IonText, IonToast } from '@ionic/angular/standalone';
-import { SupabaseService } from '../services/supabaseService/supabase';
+import {
+  LoadingController,
+  IonContent,
+  IonButton,
+  IonInput,
+  IonText,
+  IonToast
+} from '@ionic/angular/standalone';
+import { SupabaseService, UserProfileMeta } from '../services/supabaseService/supabase';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, IonButton, IonInput, IonText, ReactiveFormsModule, RouterModule, IonToast]
+  imports: [
+    IonContent,
+    CommonModule,
+    IonButton,
+    IonInput,
+    IonText,
+    ReactiveFormsModule,
+    RouterModule,
+    IonToast
+  ]
 })
 export class LoginPage {
   loginForm: FormGroup;
@@ -31,7 +48,6 @@ export class LoginPage {
     });
   }
 
-  
   get emailCtrl() { return this.loginForm.get('email'); }
   get passwordCtrl() { return this.loginForm.get('password'); }
 
@@ -46,25 +62,49 @@ export class LoginPage {
       this.loginForm.markAllAsTouched();
       return;
     }
-    const { email, password } = this.loginForm.getRawValue() as { email: string; password: string; };
+
+    const { email, password } =
+      this.loginForm.getRawValue() as { email: string; password: string; };
+
+    let loading: HTMLIonLoadingElement | null = null;
 
     try {
-      const loading = await this.loadingCtrl.create({ message: 'Iniciando sesión...', spinner: 'lines' });
+      loading = await this.loadingCtrl.create({
+        message: 'Iniciando sesión...',
+        spinner: 'lines'
+      });
       await loading.present();
 
       const { data, error } = await this.sb.signIn(email, password);
 
-      await loading.dismiss();
-
-      if (error) {
-        this.showErrorToast('Credenciales inválidas');
+      if (error || !data?.user) {
+        await loading.dismiss();
+        this.showErrorToast(error?.message || 'Credenciales inválidas');
         return;
       }
+
+      // ===== Aquí usamos metadata “completa” =====
+      const profile: UserProfileMeta | null = await this.sb.getCurrentUserProfile();
+
+      await loading.dismiss();
+
       const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') || '/home';
-      this.router.navigateByUrl(returnUrl, { replaceUrl: true, state: { email: data.user?.email ?? email } });
-    } catch {
-      try { await this.loadingCtrl.dismiss(); } catch {}
-      this.showErrorToast('No se pudo iniciar sesión');
+
+      this.router.navigateByUrl(returnUrl, {
+        replaceUrl: true,
+        state: {
+          email: profile?.email ?? email,
+          firstName: profile?.first_name ?? null,
+          lastName: profile?.last_name ?? null,
+        },
+      });
+
+    } catch (e: any) {
+      if (loading) {
+        try { await loading.dismiss(); } catch {}
+      }
+      console.error('Error en onSubmit login:', e);
+      this.showErrorToast(e?.message ?? 'No se pudo iniciar sesión');
     }
   }
 }

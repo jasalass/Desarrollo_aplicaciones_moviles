@@ -17,4 +17,10 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./login/login.page').then(m => m.LoginPage) },
   { path: 'registro', loadComponent: () => import('./registro/registro.page').then(m => m.RegistroPage) },
   { path: 'recuperar-password', loadComponent: () => import('./recuperar-password/recuperar-password.page').then(m => m.RecuperarPasswordPage) },
+  {
+    path: 'perfil',
+    loadComponent: () => import('./perfil/perfil.page').then( m => m.PerfilPage),
+    canActivate: [AuthGuard], 
+  },
+
 ];

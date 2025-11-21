@@ -1,8 +1,16 @@
+// src/app/registro/registro.page.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { LoadingController, IonContent, IonButton, IonInput, IonText, IonToast } from '@ionic/angular/standalone';
+import {
+  LoadingController,
+  IonContent,
+  IonButton,
+  IonInput,
+  IonText,
+  IonToast
+} from '@ionic/angular/standalone';
 import { SupabaseService } from '../services/supabaseService/supabase';
 
 @Component({
@@ -10,7 +18,16 @@ import { SupabaseService } from '../services/supabaseService/supabase';
   templateUrl: './registro.page.html',
   styleUrls: ['./registro.page.scss'],
   standalone: true,
-  imports: [IonToast, IonContent, CommonModule, IonButton, IonInput, IonText, ReactiveFormsModule, RouterModule]
+  imports: [
+    IonToast,
+    IonContent,
+    CommonModule,
+    IonButton,
+    IonInput,
+    IonText,
+    ReactiveFormsModule,
+    RouterModule
+  ]
 })
 export class RegistroPage {
   registerForm: FormGroup;
@@ -25,16 +42,19 @@ export class RegistroPage {
     private loadingCtrl: LoadingController
   ) {
     this.registerForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]] ,
+      first_name: ['', [Validators.required, Validators.minLength(2)]],
+      last_name: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(12)]],
     });
   }
 
-  // 👇 TAMBIÉN AQUÍ
+  get firstNameCtrl() { return this.registerForm.get('first_name'); }
+  get lastNameCtrl() { return this.registerForm.get('last_name'); }
   get emailCtrl() { return this.registerForm.get('email'); }
   get passwordCtrl() { return this.registerForm.get('password'); }
 
-  private showErrorToast(msg: string, duration = 2200) {
+  private openToast(msg: string, duration = 2200) {
     this.toastMessage = msg;
     this.toastDuration = duration;
     this.isToastOpen = true;
@@ -46,22 +66,39 @@ export class RegistroPage {
       return;
     }
 
-    const { email, password } = this.registerForm.getRawValue() as { email: string; password: string; };
+    const { first_name, last_name, email, password } =
+      this.registerForm.getRawValue() as {
+        first_name: string;
+        last_name: string;
+        email: string;
+        password: string;
+      };
 
     try {
-      const { error } = await this.sb.signUp(email, password);
+      const loading = await this.loadingCtrl.create({
+        message: 'Creando cuenta...',
+        spinner: 'lines'
+      });
+      await loading.present();
+
+      const { error } = await this.sb.signUp(email, password, first_name, last_name);
+
+      await loading.dismiss();
+
       if (error) {
-        this.showErrorToast(error.message || 'Error en registro');
+        this.openToast(error.message || 'Error en registro');
         return;
       }
 
-      const loading = await this.loadingCtrl.create({ message: 'Creando cuenta...', spinner: 'lines', duration: 1400 });
-      await loading.present();
-      await loading.onDidDismiss();
+      this.openToast('Cuenta creada. Revisa tu correo si se requiere confirmación.', 2600);
 
-      this.router.navigateByUrl('/login', { replaceUrl: true, state: { email } });
+      this.router.navigateByUrl('/login', {
+        replaceUrl: true,
+        state: { email }
+      });
     } catch (e: any) {
-      this.showErrorToast(e?.message ?? 'No se pudo registrar');
+      try { await this.loadingCtrl.dismiss(); } catch {}
+      this.openToast(e?.message ?? 'No se pudo registrar');
     }
   }
 }
