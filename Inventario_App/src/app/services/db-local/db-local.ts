@@ -16,13 +16,18 @@ export class LocalDbService {
   private db: SQLiteDBConnection | null = null;
   private readonly dbName = 'inventario';
 
+  // Promesa de inicialización
+  private initPromise: Promise<void>;
+
   constructor() {
     this.sqlite = new SQLiteConnection(CapacitorSQLite);
-    this.init();
+    this.initPromise = this.init();
   }
 
   // ========= INIT =========
-  private async init() {
+  private async init(): Promise<void> {
+    if (this.db) return;
+
     const isConn = (await this.sqlite.isConnection(this.dbName, false)).result;
     if (isConn) {
       this.db = await this.sqlite.retrieveConnection(this.dbName, false);
@@ -37,27 +42,51 @@ export class LocalDbService {
     }
 
     await this.db!.open();
-    await this.createSchema();
 
-    // meta_sync por si acaso
-    await this.run(
+    // ⚠️ IMPORTANTE: aquí usamos helpers internos SIN ensureReady()
+    await this.createSchemaInternal();
+
+    await this.runInternal(
       `INSERT OR IGNORE INTO meta_sync(key,value)
-      VALUES ('last_pull','1970-01-01T00:00:00.000Z')`
+       VALUES ('last_pull','1970-01-01T00:00:00.000Z')`
     );
 
-    // 🔹 NUEVO: solo sembrar si aún NO hay bodegas
-    const rows = await this.query<{ cnt: number }>(
+    const rows = await this.queryInternal<{ cnt: number }>(
       `SELECT COUNT(*) as cnt FROM warehouses`
     );
 
     if (!rows[0] || rows[0].cnt === 0) {
-      await this.seedDevData();
+      await this.seedDevDataInternal();
     }
   }
 
+  // Asegura que la BD esté lista para los métodos públicos
+  private async ensureReady(): Promise<void> {
+    await this.initPromise;
+    if (!this.db) {
+      throw new Error('DB not ready after init');
+    }
+  }
+
+  // ========= HELPERS INTERNOS (solo se usan dentro de init) =========
+  private async runInternal(sql: string, params: any[] = []): Promise<void> {
+    if (!this.db) throw new Error('DB not ready');
+    await this.db.run(sql, params);
+  }
+
+  private async executeInternal(sqlBatch: string): Promise<void> {
+    if (!this.db) throw new Error('DB not ready');
+    await this.db.execute(sqlBatch);
+  }
+
+  private async queryInternal<T = any>(sql: string, params: any[] = []): Promise<T[]> {
+    if (!this.db) throw new Error('DB not ready');
+    const res = await this.db.query(sql, params);
+    return res.values ?? [];
+  }
 
   // ========= SCHEMA =========
-  private async createSchema() {
+  private async createSchemaInternal() {
     const schema = `
       create table if not exists meta_sync (
         key text primary key,
@@ -119,6 +148,7 @@ export class LocalDbService {
         pending_sync integer not null default 0,
         unique (product_id, shelf_id)
       );
+
       create table if not exists scans (
         id text primary key,
         content text not null,
@@ -145,11 +175,11 @@ export class LocalDbService {
         update product_locations set updated_at = strftime('%Y-%m-%dT%H:%M:%fZ','now') where id = NEW.id;
       end;
     `;
-    await this.execute(schema);
+    await this.executeInternal(schema);
   }
 
   // ========= SEED (datos de prueba) =========
-  private async seedDevData() {
+  private async seedDevDataInternal() {
     const batch = `
       BEGIN;
 
@@ -211,14 +241,14 @@ export class LocalDbService {
 
       COMMIT;
     `;
-    await this.execute(batch);
-}
-
+    await this.executeInternal(batch);
+  }
 
   // ========= UTILIDADES =========
   private nowIso() {
     return new Date().toISOString();
   }
+
   private genId(prefix: string) {
     return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2,8)}`;
   }
@@ -242,7 +272,6 @@ export class LocalDbService {
   }
 
   // ========= PRODUCTS =========
-  /** Inserta si no existe por code; si existe, actualiza nombre/desc/min_stock. Retorna id. */
   async upsertProductByCode(
     code: string,
     name: string,
@@ -275,7 +304,6 @@ export class LocalDbService {
   }
 
   // ========= LOCATIONS =========
-  /** Crea/actualiza ubicación. Si ya existe (product_id,shelf_id) → suma cantidad. */
   async addOrUpdateLocation(
     productId: string,
     shelfId: string,
@@ -306,52 +334,50 @@ export class LocalDbService {
     }
   }
 
-  // ========= HELPERS DB =========
-  /** Ejecuta 1 sentencia con parámetros */
+  // ========= HELPERS DB PÚBLICOS =========
   async run(sql: string, params: any[] = []): Promise<void> {
-    if (!this.db) throw new Error('DB not ready');
-    await this.db.run(sql, params);
+    await this.ensureReady();
+    await this.db!.run(sql, params);
   }
 
-  /** Ejecuta múltiples sentencias separadas por ';' */
   async execute(sqlBatch: string): Promise<void> {
-    if (!this.db) throw new Error('DB not ready');
-    await this.db.execute(sqlBatch);
+    await this.ensureReady();
+    await this.db!.execute(sqlBatch);
   }
 
-  /** SELECT con tipado genérico */
   async query<T = any>(sql: string, params: any[] = []): Promise<T[]> {
-    if (!this.db) throw new Error('DB not ready');
-    const res = await this.db.query(sql, params);
+    await this.ensureReady();
+    const res = await this.db!.query(sql, params);
     return res.values ?? [];
   }
 
-  /** Ejecuta un lote de sets nativos */
   async execSet(sets: capSQLiteSet[]): Promise<void> {
-    if (!this.db) throw new Error('DB not ready');
-    await this.db.executeSet(sets);
+    await this.ensureReady();
+    await this.db!.executeSet(sets);
   }
 
-  /** Aplica la MISMA sentencia a muchas filas (any[][]). */
   async execSetFromMatrix(stmt: string, rows: any[][]): Promise<void> {
-    if (!this.db) throw new Error('DB not ready');
+    await this.ensureReady();
     const sets: capSQLiteSet[] = rows.map(values => ({ statement: stmt, values }));
-    await this.db.executeSet(sets);
+    await this.db!.executeSet(sets);
   }
 
-  // Guarda un nuevo escaneo
+  // ========= SCANS =========
   async saveScan(content: string) {
     const id = 'SCAN-' + Math.random().toString(36).substring(2, 8).toUpperCase();
     const now = new Date().toISOString();
-    await this.run(`INSERT INTO scans (id, content, created_at) VALUES (?, ?, ?)`, [id, content, now]);
+    await this.run(
+      `INSERT INTO scans (id, content, created_at) VALUES (?, ?, ?)`,
+      [id, content, now]
+    );
   }
 
-  // Devuelve todos los escaneos guardados
   async getAllScans() {
-    const sql = `SELECT * FROM scans ORDER BY created_at DESC;`;
+    const sql = `SELECT * FROM scans ORDER BY created_at DESC`;
     return await this.query(sql);
   }
-    // ========= BÚSQUEDA DE PRODUCTOS (para sugerencias) =========
+
+  // ========= BÚSQUEDA DE PRODUCTOS =========
   async searchProducts(term: string): Promise<Product[]> {
     const like = `%${term}%`;
     return this.query<Product>(
@@ -365,7 +391,7 @@ export class LocalDbService {
     );
   }
 
-  // ========= ELIMINAR PRODUCTO DE UN ESTANTE =========
+  // ========= ELIMINAR / RESTAURAR PRODUCTO DE UN ESTANTE =========
   async removeProductFromShelf(productId: string, shelfId: string): Promise<void> {
     await this.run(
       `UPDATE product_locations
@@ -376,7 +402,6 @@ export class LocalDbService {
     );
   }
 
-  // (opcional) helper para volver a marcar como no borrado si quisieras reactivar
   async restoreProductOnShelf(productId: string, shelfId: string): Promise<void> {
     await this.run(
       `UPDATE product_locations
@@ -386,5 +411,4 @@ export class LocalDbService {
       [productId, shelfId]
     );
   }
-
 }
