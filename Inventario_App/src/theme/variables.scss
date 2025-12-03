@@ -1,45 +1,76 @@
+/* src/theme/variables.scss */
+
+/* ===== Paleta base de la app (marca) ===== */
 :root {
-  --ion-color-primary: #1E3A8A;
-  --ion-color-primary-rgb: 30, 58, 138;
+  /* Marca principal */
+  --app-color-primary: #FF8A34;
+  --app-color-primary-light: #FFA75A;
+  --app-color-primary-dark: #E06F12;
 
-  --ion-color-secondary: #E5E7EB;
-  --ion-color-secondary-rgb: 229, 231, 235;
+  /* Neutros */
+  --app-color-bg-main: #FFF6EB;   /* fondo general */
+  --app-color-bg-card: #FFFFFF;   /* tarjetas */
+  --app-color-bg-soft: #F6F6F6;
 
-  --ion-color-success: #16A34A;
-  --ion-color-success-rgb: 22, 163, 74;
+  --app-color-border-subtle: rgba(0, 0, 0, 0.06);
 
-  --ion-color-warning: #FACC15;
-  --ion-color-warning-rgb: 250, 204, 21;
+  --app-text-main: #2A2A2A;
+  --app-text-muted: #6C6C6C;
+  --app-text-light: #FFFFFF;
 
-  --ion-color-danger: #DC2626;
-  --ion-color-danger-rgb: 220, 38, 38;
+  /* Estados */
+  --app-state-pending: #FDE68A;
+  --app-state-success: #4CAF50;
+  --app-state-error: #D9534F;
 
-  --ion-background-color: #F9FAFB;
-  --ion-text-color: #374151;
+  /* Radios / sombras base */
+  --app-radius-card: 18px;
+  --app-radius-pill: 999px;
+  --app-shadow-soft: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
+/* ===== Integración con el sistema de colores de Ionic ===== */
+/* Color primario (botones, toolbar, etc.) */
+:root {
+  --ion-color-primary: #FF8A34;
+  --ion-color-primary-rgb: 255, 138, 52;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #e0792e;
+  --ion-color-primary-tint: #ff9b52;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ion-text-color: #e5e7eb;
-    --ion-background-color: #0b1220;
-    --border: #1f2937;
-  }
+  --ion-color-secondary: #FFA75A;
+  --ion-color-secondary-rgb: 255, 167, 90;
+  --ion-color-secondary-contrast: #2A2A2A;
+  --ion-color-secondary-contrast-rgb: 42, 42, 42;
+  --ion-color-secondary-shade: #e0924f;
+  --ion-color-secondary-tint: #ffb673;
+
+  --ion-color-tertiary: #FFF6EB;
+  --ion-color-tertiary-rgb: 255, 246, 235;
+  --ion-color-tertiary-contrast: #2A2A2A;
+  --ion-color-tertiary-contrast-rgb: 42, 42, 42;
+  --ion-color-tertiary-shade: #e0d7cf;
+  --ion-color-tertiary-tint: #fff7ee;
+
+  --ion-color-medium: #6C6C6C;
+  --ion-color-medium-rgb: 108, 108, 108;
+  --ion-color-medium-contrast: #ffffff;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #5f5f5f;
+  --ion-color-medium-tint: #7b7b7b;
+
+  --ion-color-light: #FFFFFF;
+  --ion-color-light-rgb: 255, 255, 255;
+  --ion-color-light-contrast: #2A2A2A;
+  --ion-color-light-contrast-rgb: 42, 42, 42;
+  --ion-color-light-shade: #e0e0e0;
+  --ion-color-light-tint: #ffffff;
+
+  --ion-color-dark: #2A2A2A;
+  --ion-color-dark-rgb: 42, 42, 42;
+  --ion-color-dark-contrast: #ffffff;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #242424;
+  --ion-color-dark-tint: #3f3f3f;
 }
-
-/* Tipografía base sobria */
-body {
-  font-family: var(--font);
-  color: var(--ion-text-color);
-  background: var(--ion-background-color);
-}
-
-/* Botón austero (sin sombras ni mayúsculas forzadas) */
-ion-button {
-  --border-radius: var(--radius);
-  --padding-start: 14px;
-  --padding-end: 14px;
-  --text-transform: none;
-  height: var(--input-h);
-}
-

@@ -27,7 +27,7 @@
     <p class="home-subtitle">Bienvenido(a)</p>
 
     <div class="home-user-row">
-      <h2 *ngIf="!isLoadingProfile">Hola, {{ displayName }} 👋</h2>
+      <h2 *ngIf="!isLoadingProfile">Hola, {{ displayName }}</h2>
       <div class="home-user-loading" *ngIf="isLoadingProfile">
         <ion-spinner name="lines"></ion-spinner>
         <span>Cargando usuario...</span>
@@ -41,28 +41,29 @@
   </section>
 
   <!-- Acciones principales -->
+  <!-- Acciones principales -->
   <ion-card class="home-card home-actions">
     <ion-card-header>
       <ion-card-title>Acciones rápidas</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <div class="actions-grid">
-        <ion-button expand="block" shape="round" (click)="goScan()">
+        <ion-button expand="block" shape="round" class="btn-primary" (click)="goScan()">
           <ion-icon slot="start" name="qr-code-outline"></ion-icon>
           Escanear estante (QR)
         </ion-button>
 
-        <ion-button expand="block" shape="round" color="secondary" (click)="goAddProduct()">
+        <ion-button expand="block" shape="round" class="btn-secondary" (click)="goAddProduct()">
           <ion-icon slot="start" name="cube-outline"></ion-icon>
           Agregar producto
         </ion-button>
 
-        <ion-button expand="block" shape="round" fill="outline" (click)="goSearchProduct()">
+        <ion-button expand="block" shape="round" class="btn-outline" (click)="goSearchProduct()">
           <ion-icon slot="start" name="search-outline"></ion-icon>
           Buscar producto
         </ion-button>
 
-        <ion-button expand="block" shape="round" fill="clear" (click)="syncInventario()">
+        <ion-button expand="block" shape="round" class="btn-ghost" (click)="syncInventario()">
           <ion-icon slot="start" name="sync-outline"></ion-icon>
           Sincronizar inventario
         </ion-button>
@@ -70,12 +71,13 @@
     </ion-card-content>
   </ion-card>
 
+
   <!-- Sección bodegas -->
   <section class="home-section">
     <div class="home-section-header">
       <h3>Bodegas disponibles</h3>
       <ion-button size="small" fill="clear" (click)="loadWarehouses()">
-        <ion-icon slot="start" name="sync-outline"></ion-icon>
+        <ion-icon class="letra" slot="start" name="sync-outline" class="letra"></ion-icon>
         Actualizar
       </ion-button>
     </div>
@@ -95,11 +97,7 @@
       </ion-card>
 
       <ion-list *ngIf="warehouses.length" class="warehouses-list">
-        <ion-item
-          *ngFor="let wh of warehouses"
-          lines="none"
-          class="warehouse-item"
-        >
+        <ion-item *ngFor="let wh of warehouses" lines="none" class="warehouse-item">
           <ion-icon slot="start" name="business-outline"></ion-icon>
           <ion-label>
             <h2>{{ wh.name }}</h2>
@@ -113,12 +111,7 @@
   </section>
 
   <!-- Toast -->
-  <ion-toast
-    [isOpen]="isToastOpen"
-    [message]="toastMessage"
-    [duration]="2000"
-    color="medium"
-    position="bottom"
+  <ion-toast [isOpen]="isToastOpen" [message]="toastMessage" [duration]="2000" color="medium" position="bottom"
     (didDismiss)="isToastOpen = false">
   </ion-toast>
 </ion-content>

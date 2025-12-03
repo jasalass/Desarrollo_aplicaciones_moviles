@@ -12,14 +12,12 @@ import {
   IonList,
   IonItem,
   IonLabel,
-  IonText,
   IonCard,
   IonCardHeader,
   IonCardTitle,
   IonCardContent,
   IonIcon,
-  IonSpinner,
-  IonButton,
+  IonSpinner
 } from '@ionic/angular/standalone';
 
 import { LocalDbService } from '../services/db-local/db-local';
@@ -79,14 +77,12 @@ type ProductResult = {
     IonList,
     IonItem,
     IonLabel,
-    IonText,
     IonCard,
     IonCardHeader,
     IonCardTitle,
     IonCardContent,
     IonIcon,
-    IonSpinner,
-    IonButton,
+    IonSpinner
   ],
 })
 export class BuscarProductoPage {

@@ -20,8 +20,9 @@ export class SupabaseService {
       environment.SUPABASE_ANON_KEY,
       {
         auth: {
-          persistSession: true,
-          autoRefreshToken: true,
+          // 🔹 Para desarrollo: sin sesión persistente ni refresh automático
+          persistSession: false,
+          autoRefreshToken: false,
         },
       }
     );
@@ -82,8 +83,8 @@ export class SupabaseService {
     return {
       id: user.id,
       email: user.email ?? '',
-      first_name: meta["first_name"] ?? null,
-      last_name: meta["last_name"] ?? null,
+      first_name: meta['first_name'] ?? null,
+      last_name: meta['last_name'] ?? null,
     };
   }
 
@@ -100,5 +101,7 @@ export class SupabaseService {
     if (error) throw error;
   }
 
-  get sdk() { return this.client; }
+  get sdk() {
+    return this.client;
+  }
 }

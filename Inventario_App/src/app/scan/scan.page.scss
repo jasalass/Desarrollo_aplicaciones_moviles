@@ -1,136 +1,241 @@
-.scan-content {
-  --background: transparent;
-}
-
-.overlay {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  background: radial-gradient(transparent 46%, rgba(0,0,0,0.65) 48%);
-  color: #fff;
-}
-
-.top-bar {
-  display: grid;
-  grid-template-columns: 56px 1fr 56px;
-  align-items: center;
-  padding: 8px 6px;
-  .title {
-    text-align: center;
-    font-weight: 600;
-  }
-  ion-button {
-    --padding-start: 8px;
-    --padding-end: 8px;
-  }
-}
-
-.frame {
-  width: min(72vw, 360px);
-  height: min(72vw, 360px);
-  margin: 12vh auto 0;
-  border: 2px dashed rgba(255,255,255,0.35);
-  border-radius: 12px;
-  position: relative;
-}
-
-.corner {
-  position: absolute;
-  width: 28px; height: 28px;
-  border: 3px solid #fff;
-}
-.tl { top: -3px; left: -3px; border-right: none; border-bottom: none; border-radius: 12px 0 0 0; }
-.tr { top: -3px; right: -3px; border-left: none; border-bottom: none; border-radius: 0 12px 0 0; }
-.bl { bottom: -3px; left: -3px; border-right: none; border-top: none; border-radius: 0 0 0 12px; }
-.br { bottom: -3px; right: -3px; border-left: none; border-top: none; border-radius: 0 0 12px 0; }
-
-.hint {
-  text-align: center;
-  padding: 16px 0 24px;
-  opacity: 0.85;
-  font-size: 14px;
-}
-
-
+/* Fondo general de la página de escaneo */
 .scan-page {
-  --background: #050814;
-
-  .hero {
-    margin-bottom: 1.25rem;
-
-    h2 {
-      font-size: 1.4rem;
-      font-weight: 600;
-      margin-bottom: 0.35rem;
-    }
-
-    p {
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-  }
-
-  .scan-action {
-    margin-bottom: 1.5rem;
-
-    .hint {
-      font-size: 0.8rem;
-      opacity: 0.7;
-      margin-top: 0.4rem;
-      text-align: center;
-    }
-  }
-
-  .result-block {
-    margin-top: 0.75rem;
-  }
-
-  .shelf-card,
-  .products-card,
-  .warning-card {
-    border-radius: 16px;
-  }
-
-  .shelf-name {
-    font-weight: 600;
-    margin-bottom: 0.3rem;
-  }
-
-  .shelf-meta {
-    font-size: 0.85rem;
-    opacity: 0.9;
-    margin-bottom: 0.2rem;
-  }
-
-  .qr-text {
-    font-family: monospace;
-    font-size: 0.8rem;
-    opacity: 0.9;
-  }
-
-  .products-card ion-card-title ion-icon,
-  .warning-card ion-card-title ion-icon {
-    margin-right: 0.4rem;
-    vertical-align: middle;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 1rem 0;
-
-    ion-icon {
-      font-size: 2rem;
-      margin-bottom: 0.4rem;
-    }
-
-    p {
-      font-size: 0.9rem;
-      opacity: 0.85;
-    }
-  }
-
-  .qty {
-    font-weight: 600;
-  }
+  --background: var(--app-color-bg-main);
+  padding: 16px 16px 24px;
 }
+
+/* ===== Hero / Intro ===== */
+
+.hero {
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.hero h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--app-text-main);
+  margin-bottom: 4px;
+}
+
+.hero p {
+  font-size: 0.9rem;
+  color: var(--app-text-muted);
+  margin: 0;
+}
+
+/* ===== Acción principal: escanear estante ===== */
+
+.scan-action {
+  margin-bottom: 18px;
+}
+
+.scan-action ion-button {
+  height: 48px;
+  --border-radius: var(--app-radius-pill);
+  --background: linear-gradient(
+    135deg,
+    var(--app-color-primary),
+    var(--app-color-primary-dark)
+  );
+  --background-hover: linear-gradient(
+    135deg,
+    var(--app-color-primary-light),
+    var(--app-color-primary)
+  );
+  --color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.scan-action ion-button ion-icon {
+  font-size: 1.3rem;
+}
+
+.scan-action .hint {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+}
+
+/* ===== Bloques de resultados / tarjetas ===== */
+
+.result-block {
+  margin-top: 10px;
+}
+
+/* ion-card ya se ve bien por los estilos globales; solo ajustamos separación */
+.shelf-card,
+.products-card,
+.warning-card {
+  margin-bottom: 12px;
+}
+
+/* Estante */
+.shelf-card ion-card-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--app-text-main);
+}
+
+.shelf-name {
+  font-size: 0.96rem;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--app-text-main);
+}
+
+.shelf-meta {
+  font-size: 0.87rem;
+  color: var(--app-text-muted);
+  margin-bottom: 2px;
+}
+
+.qr-text {
+  display: inline-block;
+  margin-top: 2px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--app-color-bg-soft);
+  font-size: 0.78rem;
+}
+
+/* Productos en estante */
+
+.products-card ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.products-card ion-card-title ion-icon {
+  color: var(--app-color-primary);
+}
+
+.qty {
+  font-weight: 600;
+  color: var(--app-text-main);
+}
+
+/* Estado vacío */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 0;
+  color: var(--app-text-muted);
+  font-size: 0.88rem;
+}
+
+.empty-state ion-icon {
+  font-size: 1.6rem;
+  color: var(--app-color-primary);
+}
+
+/* Tarjeta de advertencia */
+.warning-card ion-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.warning-card ion-card-title ion-icon {
+  color: #f97316;
+}
+
+/* ===== Bloque de agregar productos ===== */
+
+.add-block {
+  margin-top: 18px;
+}
+
+.add-block h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--app-text-main);
+  margin-bottom: 8px;
+}
+
+/* Segmento de modo (QR / Formulario) */
+
+ion-segment {
+  margin-bottom: 10px;
+  --background: #ffffff;
+  border-radius: 999px;
+  box-shadow: var(--app-shadow-soft);
+}
+
+ion-segment-button {
+  --border-radius: 999px;
+  --indicator-color: var(--app-color-primary);
+  --indicator-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  font-size: 0.82rem;
+}
+
+ion-segment-button ion-icon {
+  font-size: 1rem;
+}
+
+/* Contenedor de cada modo */
+.mode-container {
+  margin-top: 10px;
+}
+
+.mode-container .hint {
+  font-size: 0.85rem;
+  color: var(--app-text-muted);
+  margin-bottom: 8px;
+}
+
+/* Botón de escanear producto en modo QR */
+.mode-container ion-button {
+  --border-radius: var(--app-radius-pill);
+}
+
+/* ===== Formulario de producto ===== */
+
+.product-form {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.product-form ion-item {
+  --background: #ffffff;
+  border-radius: 14px;
+  margin-bottom: 4px;
+}
+
+.form-actions {
+  margin-top: 8px;
+}
+
+/* Lista de sugerencias */
+.suggestions {
+  margin-top: 6px;
+  margin-bottom: 4px;
+}
+
+.suggestions ion-item {
+  --background: #ffffff;
+  border-radius: 14px;
+  margin-bottom: 4px;
+}
+
+/* Productos pendientes */
+.pending-card {
+  margin-top: 12px;
+}
+
+.pending-card ion-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.pending-card .qty {
+  font-weight: 600;
+}
+
+/* Toast hereda estilos globales de ion-toast */

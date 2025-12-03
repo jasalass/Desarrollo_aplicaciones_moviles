@@ -1,65 +1,91 @@
-ion-content {
-  --background: #020617;
+/* src/app/perfil/perfil.page.scss */
+
+/* Fondo general del contenido */
+.perfil-content {
+  --background: var(--app-color-bg-main);
+  padding: 1.4rem 1.4rem 1.8rem;
 }
 
-.perfil-content {
-  padding: 1.2rem 1.2rem 1.6rem;
+/* Toolbar (opcional, usa el tema global pero con un toque mínimo) */
+.perfil-toolbar {
+  --background: #ffffff;
+  --color: var(--app-text-main);
+  box-shadow: 0 1px 0 var(--app-color-border-subtle);
 }
+
+/* Estado de carga */
+.perfil-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 40px;
+  color: var(--app-text-muted);
+  font-size: 0.9rem;
+}
+
+/* Encabezado de perfil */
 
 .perfil-header {
   text-align: center;
   margin: 1rem 0 1.4rem;
 }
 
+/* Avatar con gradiente naranja */
 .perfil-avatar {
   width: 78px;
   height: 78px;
   border-radius: 999px;
   margin: 0 auto 0.7rem;
-  background: radial-gradient(circle at 30% 20%, #38bdf8, #1d4ed8);
+  background: linear-gradient(
+    135deg,
+    var(--app-color-primary),
+    var(--app-color-primary-dark)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #f9fafb;
+  color: #ffffff;
   font-weight: 700;
   font-size: 1.6rem;
-  box-shadow: 0 16px 50px rgba(15, 23, 42, 0.9);
 }
+
+/* Nombre y correo */
 
 .perfil-header h2 {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
-  color: #e5e7eb;
+  color: var(--app-text-main);
 }
 
 .perfil-email {
   margin-top: 0.15rem;
   font-size: 0.85rem;
-  color: #9ca3af;
+  color: var(--app-text-muted);
 }
+
+/* Tarjetas de perfil */
+/* La apariencia base viene de ion-card en global.scss, aquí solo separación */
 
 .perfil-card {
-  border-radius: 18px;
   margin-bottom: 1rem;
-  background: #020617;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.45);
-  border: 1px solid rgba(148, 163, 184, 0.25);
 }
 
-.perfil-card ion-card-header {
-  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-}
+/* Texto dentro de las tarjetas */
 
 .perfil-card ion-card-title {
   font-size: 0.95rem;
   font-weight: 600;
+  color: var(--app-text-main);
 }
 
 .perfil-card p {
   font-size: 0.9rem;
-  color: #d1d5db;
+  color: var(--app-text-main);
 }
+
+/* Formulario de edición */
 
 .perfil-form {
   display: flex;
@@ -67,25 +93,23 @@ ion-content {
   gap: 0.7rem;
 }
 
+/* Los ion-input ya tienen estilo global (pastilla blanca); aquí solo margen */
+
 .perfil-form ion-input {
-  --background: rgba(15, 23, 42, 0.85);
-  --border-radius: 14px;
-  --padding-start: 0.8rem;
-  --padding-end: 0.8rem;
-  --color: #e5e7eb;
-  --placeholder-color: #6b7280;
-  border: 1px solid rgba(148, 163, 184, 0.5);
+  margin-top: 2px;
 }
 
-.perfil-form ion-button {
-  --border-radius: 999px;
-  margin-top: 0.4rem;
-}
+/* Mensajes de error */
 
 ion-text[color="danger"] small {
   font-size: 0.75rem;
 }
 
+/* Botones dentro de tarjetas de perfil */
+
+.perfil-form ion-button,
 .perfil-card-actions ion-button {
-  --border-radius: 999px;
+  --border-radius: var(--app-radius-pill);
+  height: 44px;
 }
+

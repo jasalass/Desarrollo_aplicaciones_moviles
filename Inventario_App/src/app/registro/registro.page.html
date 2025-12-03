@@ -11,6 +11,46 @@
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="auth-form">
 
+        <!-- FIRST NAME -->
+        <div class="field-group">
+          <label class="field-label">Nombre</label>
+          <ion-input
+            type="text"
+            placeholder="Juan"
+            formControlName="first_name"
+            autocapitalize="words"
+            [clearInput]="true">
+          </ion-input>
+          <ion-text color="danger" *ngIf="firstNameCtrl?.touched && firstNameCtrl?.invalid">
+            <ng-container *ngIf="firstNameCtrl?.errors?.['required']">
+              El nombre es obligatorio.
+            </ng-container>
+            <ng-container *ngIf="firstNameCtrl?.errors?.['minlength']">
+              Debe tener al menos 2 caracteres.
+            </ng-container>
+          </ion-text>
+        </div>
+
+        <!-- LAST NAME -->
+        <div class="field-group">
+          <label class="field-label">Apellido</label>
+          <ion-input
+            type="text"
+            placeholder="Pérez"
+            formControlName="last_name"
+            autocapitalize="words"
+            [clearInput]="true">
+          </ion-input>
+          <ion-text color="danger" *ngIf="lastNameCtrl?.touched && lastNameCtrl?.invalid">
+            <ng-container *ngIf="lastNameCtrl?.errors?.['required']">
+              El apellido es obligatorio.
+            </ng-container>
+            <ng-container *ngIf="lastNameCtrl?.errors?.['minlength']">
+              Debe tener al menos 2 caracteres.
+            </ng-container>
+          </ion-text>
+        </div>
+
         <!-- EMAIL -->
         <div class="field-group">
           <label class="field-label">Correo electrónico</label>

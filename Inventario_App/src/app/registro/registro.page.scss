@@ -1,32 +1,134 @@
-ion-content {
-  --background: #020617;
+/* src/app/registro/registro.page.scss */
+
+/* Fondo general del contenido */
+.auth-content {
+  --background: var(--app-color-bg-main);
+  position: relative;
+  padding: 40px 16px;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-.form {
+/* Forma decorativa naranja en la esquina superior derecha */
+.auth-gradient {
+  position: absolute;
+  width: 360px;
+  height: 260px;
+  background: linear-gradient(
+    135deg,
+    var(--app-color-primary),
+    var(--app-color-primary-dark)
+  );
+  top: 0;
+  right: 0;
+  border-bottom-left-radius: 180px;
+  z-index: 0;
+  opacity: 0.95;
+}
+
+/* En pantallas chicas la hacemos más pequeña */
+@media (max-width: 480px) {
+  .auth-gradient {
+    width: 280px;
+    height: 220px;
+    border-bottom-left-radius: 150px;
+  }
+}
+
+/* Wrapper centrado horizontalmente */
+.auth-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
   max-width: 420px;
-  margin: 0 auto;
-  padding: 2.5rem 1.5rem 2rem;
+  margin: 24px auto 32px;
+}
+
+/* Tarjeta principal */
+.auth-card {
+  background: #ffffff;
+  border-radius: var(--app-radius-card);
+  box-shadow: var(--app-shadow-soft);
+  padding: 24px 20px 18px;
+}
+
+/* Encabezado */
+.auth-header h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--app-text-main);
+  margin-bottom: 4px;
+}
+
+.auth-header p {
+  font-size: 0.9rem;
+  color: var(--app-text-muted);
+  margin: 0 0 10px;
+}
+
+/* Formulario */
+.auth-form {
   display: flex;
   flex-direction: column;
-  gap: 0.9rem;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-.form ion-input {
-  --background: rgba(15, 23, 42, 0.85);
-  --border-radius: 14px;
-  --padding-start: 0.9rem;
-  --padding-end: 0.9rem;
-  --color: #e5e7eb;
-  --placeholder-color: #6b7280;
-  border: 1px solid rgba(148, 163, 184, 0.5);
+/* Grupo de campo */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.form ion-button {
-  --border-radius: 999px;
-  margin-top: 0.4rem;
+.field-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--app-text-main);
 }
 
+/* Inputs: usan el estilo global, aquí solo margen */
+.field-group ion-input {
+  margin-top: 2px;
+}
+
+/* Mensajes de error */
 ion-text[color="danger"] {
   font-size: 0.78rem;
-  margin-top: -0.4rem;
+  margin-top: 2px;
+}
+
+/* Botón principal */
+.auth-main-button {
+  margin-top: 6px;
+  height: 44px;
+  --border-radius: var(--app-radius-pill);
+}
+
+/* Links secundarios (volver a login) */
+.auth-links {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.link-button {
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+  font-size: 0.85rem;
+  color: var(--app-color-primary);
+  text-align: center;
+}
+
+/* Pie de página */
+.auth-footer {
+  margin-top: 14px;
+  text-align: center;
+}
+
+.auth-footer p {
+  font-size: 0.8rem;
+  color: var(--app-text-muted);
 }

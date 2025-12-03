@@ -109,7 +109,7 @@
     <h3>Agregar productos a este estante</h3>
 
     <!-- Selector de modo -->
-    <ion-segment [value]="addMode"  (ionChange)="onModeChange($event)">>
+    <ion-segment [value]="addMode"  (ionChange)="onModeChange($event)">
       <ion-segment-button value="qr">
         <ion-icon name="qr-code-outline"></ion-icon>
         QR producto
@@ -185,7 +185,7 @@
           </ion-input>
         </ion-item>
 
-        <div class="form-actions">
+        <div class="form-actions p-2">
           <ion-button expand="block" shape="round" color="primary" (click)="addPendingItem()">
             <ion-icon slot="start" [name]="editingIndex !== null ? 'create-outline' : 'add-circle-outline'"></ion-icon>
             {{ editingIndex !== null ? 'Actualizar en lista' : 'Agregar a lista' }}
